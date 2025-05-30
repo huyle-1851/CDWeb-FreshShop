@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: freshshop-app
+    env: java
+    buildCommand: ./mvnw clean install
+    startCommand: java -jar target/CDWeb-FreshShop-0.0.1.jar
+    branch: main
