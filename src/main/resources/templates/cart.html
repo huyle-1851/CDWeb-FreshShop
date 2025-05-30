@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <div th:replace="~{fragments/my-fragments.html::link}"/>-->
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
+
+<!-- Start All Title Box -->
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Giỏ Hàng</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="#">Cửa Hàng</a></li>
+                    <li class="breadcrumb-item active">Giỏ Hàng</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Title Box -->
+
+<!-- Start Cart -->
+<div th:with="totals"/>
+<div class="cart-box-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="table-main table-responsive">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th style="width: 10%;">Ảnh</th>
+                            <th style="width: 50%;">Tên Sản Phẩm</th>
+                            <th style="width: 12%;">Giá</th>
+                            <th style="width: 10%;">Số lượng</th>
+                            <th style="width: 13%;">Tổng</th>
+                            <th style="width: 5%;">Xóa</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <th:block th:each="item, state: ${cart}">
+                            <div th:with="product=${item.getProduct()}"/>
+                            <div th:with="url='product-detail?id=${product.getId()}'"/>
+                            <tr th:id="item${state.index}">
+                                <td class="thumbnail-img">
+                                    <a href="${url}">
+                                        <img class="img-fluid" src="${product.getImages()[0]}" alt=""/>
+                                    </a>
+                                </td>
+                                <td class="name-pr">
+                                    <a href="${url}">
+                                        ${product.getName()}
+                                    </a>
+                                </td>
+                                <td class="price-pr">
+                                    <p>
+                                    <div th:with="check=${product.getDiscountedPrice()==0||product.getDiscountedPrice()==product.getPrice()}"/>
+                                    <div th:with="price=0"/>
+                                    <div th:if="${check}">${product.getPrice()}đ
+                                        <div th:with="price=${product.getPrice()}"/>
+                                    </div>
+                                    <div th:unless="${check}">${product.getDiscountedPrice()}đ
+                                        <div th:with="price=${product.getDiscountedPrice()}"/>
+                                    </div>
+                                    </p>
+                                </td>
+                                <td class="quantity-box"><input id="${index.index}" type="number" size="4"
+                                                                value="${item.getQuantity()}"
+                                                                min="1" step="1"
+                                                                class="c-input-text qty text"
+                                                                th:onchange="addItems(${product.getId()},${price},${cart.size()},this,false)">
+                                </td>
+                                <td class="total-pr">
+                                    <p id="total-pr${index.index}"
+                                       data-value="${price * item.getQuantity()}">${price * item.getQuantity()}đ</p>
+                                    <div th:with="tmp=${totals = totals + (price * item.getQuantity())}"/>
+                                </td>
+                                <td>
+                                    <button style="border: none; background: none; cursor: pointer;"
+                                            th:onclick="removeItem(${product.getId()},${index.index}, ${cart.size()})"><i
+                                            class="fas fa-times"></i></button>
+                                </td>
+                            </tr>
+                        </th:block>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="row my-5">
+            <div class="col-lg-8 col-sm-12"></div>
+            <div class="col-lg-4 col-sm-12">
+                <div class="order-box">
+                    <div class="d-flex">
+                        <h4>Tổng cộng</h4>
+                        <div id="total-bill"
+                             class="ml-auto font-weight-bold">${totals}đ
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 d-flex shopping-box"><a href="checkout.jsp" class="ml-auto btn hvr-hover">Thanh
+                Toán</a></div>
+        </div>
+
+    </div>
+</div>
+<!-- End Cart -->
+
+<div th:replace="~{fragments/my-fragments.html::footer}"/>
+</body>
+</html>

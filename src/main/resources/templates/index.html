@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <div th:replace="~{fragments/my-fragments.html::link}"/>-->
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
+
+<!-- Start Slider -->
+<div id="slides-shop" class="cover-slides">
+    <ul class="slides-container">
+        <li class="text-center">
+<!--            <img th:src="images/banner-01.jpg" alt="">-->
+            <img src="/images/banner-01.jpg" alt="" th:src="@{/images/banner-01.jpg}">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
+                        <p class="m-b-40">-----------------------</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="text-center">
+            <img src="images/banner-02.jpg" alt="">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
+                        <p class="m-b-40">-----------------------</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+        <li class="text-center">
+            <img src="images/banner-03.jpg" alt="">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-12">
+                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
+                        <p class="m-b-40">-----------------------</p>
+                    </div>
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div class="slides-navigation">
+        <a href="#" class="next"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
+        <a href="#" class="prev"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+    </div>
+</div>
+<!-- End Slider -->
+
+<div class="box-add-products">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="offer-box-products">
+                    <img class="img-fluid" src="images/add-img-01.jpg" alt=""/>
+                </div>
+            </div>
+            <div class="col-lg-6 col-md-6 col-sm-12">
+                <div class="offer-box-products">
+                    <img class="img-fluid" src="images/add-img-02.jpg" alt=""/>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Start Products -->
+<div class="products-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="title-all text-center">
+                    <h1>Trái cây & rau củ</h1>
+                    <p>---------------------</p>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="special-menu text-center">
+                    <div class="button-group filter-button-group">
+                        <button class="active" data-filter="*" onclick="x()">Tất cả</button>
+                        <button data-filter=".top-featured">Mới</button>
+                        <button data-filter=".best-seller">Giảm giá</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row special-list">
+            <div th:each="item, state: ${listAllProduct}" th:if="${state.index < 3}"
+                 class="col-lg-3 col-md-6 special-grid best-seller">
+                <div class="products-single fix">
+                    <div class="box-img-hover">
+                        <div class="type-lb">
+
+                            <p th:if="${item.getStatus()} != null" class="sale">
+                                ${item.getStatus()}
+                            </p>
+                        </div>
+                        <div style="width: 255px; height: 241px">
+                            <img src="<c:out value='${item.getImages()[0]}' default=''/>" class="img-fluid"
+                                 alt="Image">
+                        </div>
+                        <div class="mask-icon"
+                             th:with="check=${item.getDiscountedPrice()==0||item.getDiscountedPrice()==item.getPrice()},price=0">
+                            <th:block>
+                                <div th:if="${check}">
+                                    <div th:with="price=${item.getPrice()}"/>
+                                </div>
+                                <div th:unless="${check}">
+                                    <div th:with="price=${item.getDiscountedPrice()}"/>
+                                </div>
+                            </th:block>
+                            <th:block th:if="${username!=null}">
+                                <a class="cart" style="cursor: pointer"
+                                   onclick="updateCart('${item.getId()}');
+                                   alert('Đã thêm sản phẩm');">
+                                    Thêm vào giỏ</a>
+                            </th:block>
+                            <th:block th:if="${username==null}">
+                                <a class="cart" style="cursor: pointer"
+                                   onclick="updateCart('${item.getId()}');
+                                        alert('Vui lòng đăng nhập trước');
+                                        window.location.href='login';">
+                                    Thêm vào giỏ</a>
+                            </th:block>
+                        </div>
+                    </div>
+                    <a href="product-detail?id=${item.getId()}" style="cursor: pointer;">
+                        <div class="why-text">
+                            <h4>${item.getName()}</h4>
+                            <h5>${item.getPrice()}đ</h5>
+                        </div>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Products -->
+
+<div th:replace="~{fragments/my-fragments.html::footer}"/>
+</body>
+</html>

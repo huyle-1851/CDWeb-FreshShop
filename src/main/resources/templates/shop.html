@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <!--    <div th:replace="~{fragments/my-fragments.html::link}"/>-->
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
+
+<th:block th:with="productList=${products}">
+    <!-- Start All Title Box -->
+    <div class="all-title-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Cửa hàng</h2>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
+                        <li class="breadcrumb-item active">Cửa hàng</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End All Title Box -->
+
+    <!-- Start Shop Page -->
+    <div class="shop-box-inner">
+        <div class="container">
+            <div class="row">
+                <div class="col-xl-9 col-lg-9 col-sm-12 col-xs-12 shop-content-right">
+                    <div class="right-product-box">
+                        <div class="product-item-filter row">
+                            <div class="col-12 col-sm-8 text-center text-sm-left">
+                                <div class="toolbar-sorter-right">
+                                    <span>Sắp xếp</span>
+                                    <select id="sort" class="selectpicker show-tick form-control"
+                                            data-placeholder="$ USD"
+                                            onchange="sort()">
+                                        <option value="1">Giá thấp → Giá cao</option>
+                                        <option value="2">Giá cao → Giá thấp</option>
+                                        <option value="3">Mới nhất</option>
+                                        <option value="4">Giảm giá</option>
+                                    </select>
+                                </div>
+                                <p id="number-of-result">Đang hiện <span th:text="${productList.size()}"></span> kết quả
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="product-categorie-box">
+                            <div class="tab-content">
+                                <div role="tabpanel" class="tab-pane fade show active" id="grid-view">
+                                    <div class="row" id="product-list">
+                                        <div th:each="pro:${productList}"
+                                             class="col-sm-6 col-md-6 col-lg-4 col-xl-4 product-cell">
+                                            <div class="products-single fix">
+                                                <div class="box-img-hover" style="height: 255px">
+
+                                                    <div class="type-lb">
+                                                        <p th:if="${pro.getStatus() != null || pro.getStatus() != ''}"
+                                                           class="status-param sale" th:text="${pro.getStatus()}"></p>
+                                                    </div>
+
+                                                    <img th:src="${pro.images[0].getUrl()}"
+                                                         class="img-fluid image-param" alt="Image">
+
+                                                    <div class="mask-icon">
+                                                        <th:block th:if="${username!=null}">
+                                                            <a class="cart" style="cursor: pointer"
+                                                               onclick="updateCart('${pro.getId()}');
+                                                                        alert('Đã thêm sản phẩm');">
+                                                                Thêm vào giỏ
+                                                            </a>
+                                                        </th:block>
+                                                        <th:block th:if="${username==null}">
+                                                            <a class="cart" style="cursor: pointer"
+                                                               onclick="updateCart('${pro.getId()}');
+                                                                        alert('Vui lòng đăng nhập trước');
+                                                                        window.location.href='login'">
+                                                                Thêm vào giỏ
+                                                            </a>
+                                                        </th:block>
+                                                    </div>
+                                                </div>
+                                                <a class="id-param" th:href="@{/product-detail(id=${pro.id})}" href="#"
+                                                   style="cursor: pointer;">
+                                                    <div class="why-text" style="height: 113px"
+                                                         th:with="check=${pro.getDiscountedPrice()==0||pro.getDiscountedPrice()==pro.getPrice()}">
+                                                        <h4 class="name-param" th:text="${pro.getName()}"></h4>
+                                                        <h5 class="price-param">
+                                                            <div th:if="${check}"><span th:text="${pro.getPrice()}"/>đ
+                                                            </div>
+                                                            <div th:unless="${check}"><span
+                                                                    th:text="${pro.getDiscountedPrice()}"/>đ
+                                                            </div>
+                                                        </h5>
+                                                    </div>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-xl-3 col-lg-3 col-sm-12 col-xs-12 sidebar-shop-left">
+                    <div class="product-categori">
+                        <div class="search-product">
+                            <form action="search">
+                                <input class="form-control" name="name-pattern" placeholder="Tìm kiếm..." type="text">
+                                <button type="submit"><i class="fa fa-search"></i></button>
+                            </form>
+                        </div>
+                        <div class="filter-sidebar-left">
+                            <div class="title-left">
+                                <h3>Phân loại</h3>
+                            </div>
+                            <div class="list-group list-group-collapse list-group-sm list-group-tree"
+                                 id="list-group-men"
+                                 data-children=".sub-men" style="overflow: scroll; height: 400px">
+                                <a th:each="category:${categories}" th:href="@{/category(id=${category.getId()})}"
+                                   th:text="${category.getName()}">
+                                    <small class="text-muted"><strong>(<span th:text="${category.getQuantity()}"></span>)</strong></small>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="filter-price-left">
+                            <div class="title-left">
+                                <h3>Giá</h3>
+                            </div>
+                            <strong>Nhập khoảng giá</strong>
+                            <form action="filter" method="get">
+                                <input required type="text" name="from-price" value="" style="width: 100%">
+                                <div style="text-align: center"><strong>Đến</strong></div>
+                                <input required type="text" name="to-price" style="width: 100%">
+                                <input type="text" name="category_id" value="${category_id}" style="display: none">
+                                <div style="display: flex; justify-content: right; margin-top: 10px;">
+                                    <button class="btn" type="submit" style="background: #b0b435; color: white"><a
+                                            href="filter?category_id=${category_id}"><strong>Lọc</strong></a>
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+    <!-- End Shop Page -->
+</th:block>
+<div th:replace="~{fragments/my-fragments::footer}"/>
+</body>
+</html>

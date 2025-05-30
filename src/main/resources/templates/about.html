@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <div th:replace="~{fragments/my-fragments.html::link}"/>-->
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
+
+<!-- Start All Title Box -->
+<div class="all-title-box">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-12">
+                <h2>Giới thiệu</h2>
+                <ul class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="home">Trang chủ</a></li>
+                    <li class="breadcrumb-item active">Giới thiệu</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End All Title Box -->
+
+<!-- Start About Page -->
+<div class="about-box-main">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6">
+                <div class="banner-frame"><img class="img-fluid" src="images/about-img.jpg" alt=""/>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <h2 class="noo-sh-title-top">Chúng tôi là <span>Freshshop</span></h2>
+                <p>Nơi đây bán các loại rau củ tươi, hoa tươi và cà phê, các loại trà của Cầu Đất Farm (nông trại của
+                    Đà Lạt). Vốn đã có tiếng tăm từ lâu, vậy nên khách hàng tại Tp.HCM có thể an tâm mua các loại thực
+                    phẩm sạch tại đây nhé.</p>
+                <p>Cửa hàng chuyên bán nhiều loại thực phẩm cao cấp như rau quả hữu cơ, trái cây từ nước ngoài, độc
+                    quyền từ các thương hiệu có tiếng tăm trên thế giới. Ngoài ra, quý khách có thể tìm mua cả những
+                    loại thịt, cá tươi tại đây</p>
+            </div>
+        </div>
+        <div class="row my-5">
+            <div class="col-sm-6 col-lg-4">
+                <div class="service-block-inner">
+                    <h3>Chúng tôi được tin cậy</h3>
+                    <p>Trái cây sạch, tươi ngon hiện đang là sự lựa chọn hàng đầu cho mọi gia đình bởi lợi ích của nó
+                        dành cho sức khỏe. </p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="service-block-inner">
+                    <h3>Chúng tôi rất chuyên nghiệp</h3>
+                    <p>Với cam kết không hóa chất, chất bảo quản và chất kích thích, cửa hàng trái cây sạch Sunflower sẽ
+                        đem đến cho bạn những sản phẩm an toàn, chất lượng. </p>
+                </div>
+            </div>
+            <div class="col-sm-6 col-lg-4">
+                <div class="service-block-inner">
+                    <h3>Chúng tôi là chuyên gia</h3>
+                    <p>Tự hào là cửa hàng trái cây sạch với hàng hóa có nguồn gốc xuất xứ cũng như việc luôn giữ được độ
+                        tươi ngon trong sản phẩm của mình. </p>
+                </div>
+            </div>
+        </div>
+<!-- End About Page -->
+
+<div th:replace="~{fragments/my-fragments.html::footer}"/>
+</body>
+</html>

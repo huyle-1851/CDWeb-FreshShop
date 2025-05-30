@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+<!--    <div th:replace="~{fragments/my-fragments.html::link}"/>-->
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}" %/>
+<section class="form-input py-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-5 col-md-5 col-12">
+                <div class="h-100 d-flex align-items-center">
+                    <form class="m-0 p-5 text-center" action="login" method="post"
+                          th:with="username = ${session.username}, errorLogin = ${errorLogin}">
+                        <h1 class="mb-4">Đăng Nhập</h1>
+
+                        <div id="error" style="display: none; color: red">Đăng nhập không thành công. Bạn vui lòng thử
+                            lại.
+                        </div>
+                        <input class="w-100 mb-3" id="username" type="text" placeholder="Tên đăng nhập" name="username"
+                               th:value="${username}">
+                        <input class="w-100 mb-4" type="password" placeholder="Mật khẩu" name="password">
+                        <th:block th:if="${errorLogin}">
+                            <script>
+                                document.getElementById("error").setAttribute("style", "display: block; color: red")
+                            </script>
+                        </th:block>
+
+                        <button class="next w-100" type="submit">Đăng nhập</button>
+                        <span class="or d-inline-block text-uppercase my-4 position-relative">Hoặc</span>
+                        <a class="google d-flex justify-content-center w-100 mb-3"><img width="25px" class="mr-2"
+                                                                                        src="images/google-logo.png"
+                                                                                        alt="">Google</a>
+                        <span class="shotcut">
+                            <a class="mr-3" href="forgot-password">Quên mật khẩu?</a>
+                            <a href="register">Đăng ký</a>
+                        </span>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<div th:replace="~{fragments/my-fragments.html::footer}"></div>
+
+</body>
+</html>
