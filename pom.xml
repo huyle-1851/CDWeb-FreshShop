@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>vn.fshop</groupId>
 	<artifactId>CDWeb-FreshShop</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>CDWeb-FreshShop</name>
 	<description>Fresh shop project</description>
 	<packaging>jar</packaging>
