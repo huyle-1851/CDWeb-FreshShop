@@ -8,46 +8,54 @@
     <title>Fresh Shop</title>
 
     <!-- Site Icons -->
-    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
-    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 
     <!-- Site CSS -->
-    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Responsive CSS -->
-    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
-<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}" %/>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"></div>
 <section class="form-input py-5">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-5 col-md-5 col-12">
                 <div class="h-100 d-flex align-items-center">
-                    <form class="m-0 p-5 text-center" action="login" method="post"
-                          th:with="username = ${session.username}, errorLogin = ${errorLogin}">
+                    <form class="m-0 p-5 text-center" id="loginForm">
                         <h1 class="mb-4">Đăng Nhập</h1>
 
-                        <div id="error" style="display: none; color: red">Đăng nhập không thành công. Bạn vui lòng thử
-                            lại.
-                        </div>
-                        <input class="w-100 mb-3" id="username" type="text" placeholder="Tên đăng nhập" name="username"
-                               th:value="${username}">
-                        <input class="w-100 mb-4" type="password" placeholder="Mật khẩu" name="password">
-                        <th:block th:if="${errorLogin}">
-                            <script>
-                                document.getElementById("error").setAttribute("style", "display: block; color: red")
-                            </script>
-                        </th:block>
+                        <!-- Success Message -->
+                        <div id="successMessage" class="alert alert-success" style="display: none;"></div>
 
-                        <button class="next w-100" type="submit">Đăng nhập</button>
+                        <!-- Error Message -->
+                        <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+                        <!-- Username Field -->
+                        <div class="form-group mb-3">
+                            <input class="form-control w-100" id="username" type="text" placeholder="Tên đăng nhập" name="username">
+                            <div class="invalid-feedback" id="usernameError"></div>
+                        </div>
+
+                        <!-- Password Field -->
+                        <div class="form-group mb-4">
+                            <input class="form-control w-100" id="password" type="password" placeholder="Mật khẩu" name="password">
+                            <div class="invalid-feedback" id="passwordError"></div>
+                        </div>
+
+                        <button class="next w-100" type="submit" id="loginBtn">
+                            <span id="loginBtnText">Đăng nhập</span>
+                            <span id="loginSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                        </button>
                         <span class="or d-inline-block text-uppercase my-4 position-relative">Hoặc</span>
                         <a class="google d-flex justify-content-center w-100 mb-3"><img width="25px" class="mr-2"
-                                                                                        src="images/google-logo.png"
+                                                                                        th:src="@{/images/google-logo.png}"
                                                                                         alt="">Google</a>
                         <span class="shotcut">
                             <a class="mr-3" href="forgot-password">Quên mật khẩu?</a>
@@ -60,6 +68,113 @@
     </div>
 </section>
 <div th:replace="~{fragments/my-fragments.html::footer}"></div>
+
+<!-- JavaScript -->
+<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+
+<script>
+$(document).ready(function() {
+    console.log('Login page JavaScript loaded');
+
+    // Handle login form submission
+    $('#loginForm').on('submit', function(e) {
+        e.preventDefault();
+        console.log('Form submitted via AJAX');
+
+        // Clear previous errors
+        clearErrors();
+
+        // Get form data
+        const username = $('#username').val().trim();
+        const password = $('#password').val().trim();
+
+        // Show loading state
+        showLoading(true);
+
+        // Submit via AJAX
+        console.log('Sending AJAX request to /api/login');
+        $.ajax({
+            url: '/api/login',
+            method: 'POST',
+            data: {
+                username: username,
+                password: password
+            },
+            success: function(response) {
+                console.log('AJAX success:', response);
+                showLoading(false);
+                if (response.success) {
+                    showSuccess(response.message);
+                    // Redirect after short delay
+                    setTimeout(function() {
+                        window.location.href = response.redirectUrl || '/';
+                    }, 1500);
+                } else {
+                    showError(response.error || 'Đăng nhập không thành công');
+                }
+            },
+            error: function(xhr) {
+                console.log('AJAX error:', xhr);
+                showLoading(false);
+                const response = xhr.responseJSON;
+                if (response && response.errors) {
+                    displayFieldErrors(response.errors);
+                } else if (response && response.error) {
+                    showError(response.error);
+                } else {
+                    showError('Có lỗi xảy ra khi đăng nhập. Vui lòng thử lại.');
+                }
+            }
+        });
+    });
+
+    // Clear errors when user types
+    $('#username, #password').on('input', function() {
+        clearFieldError($(this).attr('id'));
+    });
+});
+
+function showLoading(show) {
+    if (show) {
+        $('#loginBtnText').hide();
+        $('#loginSpinner').show();
+        $('#loginBtn').prop('disabled', true);
+    } else {
+        $('#loginBtnText').show();
+        $('#loginSpinner').hide();
+        $('#loginBtn').prop('disabled', false);
+    }
+}
+
+function showSuccess(message) {
+    $('#successMessage').text(message).show();
+    $('#errorMessage').hide();
+}
+
+function showError(message) {
+    $('#errorMessage').text(message).show();
+    $('#successMessage').hide();
+}
+
+function clearErrors() {
+    $('#successMessage, #errorMessage').hide();
+    $('.form-control').removeClass('is-invalid');
+    $('.invalid-feedback').hide().text('');
+}
+
+function clearFieldError(fieldId) {
+    $('#' + fieldId).removeClass('is-invalid');
+    $('#' + fieldId + 'Error').hide().text('');
+}
+
+function displayFieldErrors(errors) {
+    for (const [field, message] of Object.entries(errors)) {
+        $('#' + field).addClass('is-invalid');
+        $('#' + field + 'Error').text(message).show();
+    }
+}
+</script>
 
 </body>
 </html>

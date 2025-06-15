@@ -1,12 +1,10 @@
 package vn.fshop.model;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.util.*;
-import org.hibernate.annotations.JdbcTypeCode;
-import org.hibernate.type.SqlTypes;
 
 @Data
 @AllArgsConstructor
@@ -14,16 +12,20 @@ import org.hibernate.type.SqlTypes;
 @Entity
 @Table(name = "image")
 public class Image {
-	@Id
-	@Column(columnDefinition = "VARCHAR(36)")
-	@JdbcTypeCode(SqlTypes.VARCHAR)
-	private UUID id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
 
-	@ManyToOne
-	@JoinColumn(name = "product_id")
-	private Product product;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
 
-	@Column(name = "url")
-	private String url;
+    @Column(name = "url", nullable = false)
+    @NotBlank(message = "Image URL is required")
+    private String url;
 
+    public Image(Product product, String url) {
+        this.product = product;
+        this.url = url;
+    }
 }

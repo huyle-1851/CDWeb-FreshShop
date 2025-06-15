@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Báo cáo & Thống kê - FreshShop Admin</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="/css/responsive.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/custom.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+
+<body>
+    <!-- Start Main Top -->
+    <div th:replace="~{fragments/my-fragments.html::header('admin-reports')}"/>
+    <!-- End Main Top -->
+
+    <!-- Start All Title Box -->
+    <div class="all-title-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Báo cáo & Thống kê</h2>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Admin</a></li>
+                        <li class="breadcrumb-item active">Báo cáo</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End All Title Box -->
+
+    <!-- Start Reports -->
+    <div class="reports-box-main">
+        <div class="container">
+            <!-- Dashboard Statistics -->
+            <div class="row mb-4" id="dashboard-stats">
+                <!-- Statistics will be loaded here -->
+            </div>
+
+            <!-- Sales Report Section -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-chart-line mr-2"></i>
+                                Báo cáo doanh thu
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <label for="periodSelect">Chọn khoảng thời gian:</label>
+                                    <select class="form-control" id="periodSelect" onchange="loadSalesReport()">
+                                        <option value="today">Hôm nay</option>
+                                        <option value="week" selected>7 ngày qua</option>
+                                        <option value="month">30 ngày qua</option>
+                                        <option value="year">1 năm qua</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <button class="btn btn-info mt-4" onclick="loadAllReports()">
+                                        <i class="fa fa-refresh"></i> Tải lại báo cáo
+                                    </button>
+                                </div>
+                            </div>
+                            <div id="sales-report">
+                                <!-- Sales report will be loaded here -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Overview -->
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-box mr-2"></i>
+                                Tổng quan sản phẩm
+                            </h5>
+                        </div>
+                        <div class="card-body" id="product-overview">
+                            <!-- Product overview will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card">
+                        <div class="card-header bg-info text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-users mr-2"></i>
+                                Tổng quan người dùng
+                            </h5>
+                        </div>
+                        <div class="card-body" id="user-overview">
+                            <!-- User overview will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Order Statistics -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-warning text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-shopping-cart mr-2"></i>
+                                Thống kê đơn hàng
+                            </h5>
+                        </div>
+                        <div class="card-body" id="order-statistics">
+                            <!-- Order statistics will be loaded here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-secondary text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-tools mr-2"></i>
+                                Thao tác nhanh
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3">
+                                    <a href="/admin/products" class="btn btn-primary btn-block">
+                                        <i class="fa fa-box"></i><br>
+                                        Quản lý sản phẩm
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="/admin/orders" class="btn btn-success btn-block">
+                                        <i class="fa fa-shopping-cart"></i><br>
+                                        Quản lý đơn hàng
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="/admin/categories" class="btn btn-warning btn-block">
+                                        <i class="fa fa-tags"></i><br>
+                                        Quản lý danh mục
+                                    </a>
+                                </div>
+                                <div class="col-md-3">
+                                    <a href="/admin/dashboard" class="btn btn-info btn-block">
+                                        <i class="fa fa-tachometer-alt"></i><br>
+                                        Dashboard
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Reports -->
+
+    <div th:replace="~{fragments/my-fragments.html::footer}"/>
+
+    <!-- ALL JS FILES -->
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- ALL PLUGINS -->
+    <script src="/js/jquery.superslides.min.js"></script>
+    <script src="/js/bootstrap-select.js"></script>
+    <script src="/js/inewsticker.js"></script>
+    <script src="/js/bootsnav.js"></script>
+    <script src="/js/images-loded.min.js"></script>
+    <script src="/js/isotope.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/baguetteBox.min.js"></script>
+    <script src="/js/form-validator.min.js"></script>
+    <script src="/js/contact-form-script.js"></script>
+    <script src="/js/custom.js"></script>
+
+    <!-- Reports JavaScript -->
+    <script>
+        // Load reports on page load
+        $(document).ready(function() {
+            loadAllReports();
+        });
+
+        // Load all reports
+        function loadAllReports() {
+            loadDashboardStats();
+            loadSalesReport();
+        }
+
+        // Load dashboard statistics
+        function loadDashboardStats() {
+            fetch('/admin/reports/dashboard-stats')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displayDashboardStats(data.statistics);
+                    } else {
+                        showError('Không thể tải thống kê: ' + (data.error || 'Lỗi không xác định'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Có lỗi xảy ra khi tải thống kê');
+                });
+        }
+
+        // Display dashboard statistics
+        function displayDashboardStats(stats) {
+            // Main statistics cards
+            const dashboardHtml = `
+                <div class="col-md-3">
+                    <div class="card text-center bg-primary text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Tổng đơn hàng</h5>
+                            <h2>${stats.orders.total}</h2>
+                            <small>Đã giao: ${stats.orders.delivered}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-success text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Doanh thu</h5>
+                            <h2>${formatCurrency(stats.revenue.total)}</h2>
+                            <small>30 ngày: ${formatCurrency(stats.revenue.recent)}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-info text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Sản phẩm</h5>
+                            <h2>${stats.products.total}</h2>
+                            <small>Hoạt động: ${stats.products.active}</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card text-center bg-warning text-white">
+                        <div class="card-body">
+                            <h5 class="card-title">Người dùng</h5>
+                            <h2>${stats.users.total}</h2>
+                            <small>Admin: ${stats.users.admin}</small>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#dashboard-stats').html(dashboardHtml);
+
+            // Product overview
+            const productHtml = `
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-primary">${stats.products.total}</h4>
+                            <p>Tổng sản phẩm</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-success">${stats.products.active}</h4>
+                            <p>Đang hoạt động</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar bg-success" style="width: ${(stats.products.active / stats.products.total * 100)}%"></div>
+                        </div>
+                        <small class="text-muted">Tỷ lệ sản phẩm hoạt động</small>
+                    </div>
+                </div>
+            `;
+            $('#product-overview').html(productHtml);
+
+            // User overview
+            const userHtml = `
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-info">${stats.users.total}</h4>
+                            <p>Tổng người dùng</p>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h4 class="text-warning">${stats.users.admin}</h4>
+                            <p>Quản trị viên</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <div class="progress">
+                            <div class="progress-bar bg-warning" style="width: ${(stats.users.admin / stats.users.total * 100)}%"></div>
+                        </div>
+                        <small class="text-muted">Tỷ lệ quản trị viên</small>
+                    </div>
+                </div>
+            `;
+            $('#user-overview').html(userHtml);
+
+            // Order statistics
+            const orderHtml = `
+                <div class="row">
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-warning">${stats.orders.pending}</h4>
+                            <p>Chờ xử lý</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-success">${stats.orders.delivered}</h4>
+                            <p>Đã giao hàng</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-primary">${stats.orders.total}</h4>
+                            <p>Tổng đơn hàng</p>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="text-center">
+                            <h4 class="text-info">${stats.categories.total}</h4>
+                            <p>Danh mục</p>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#order-statistics').html(orderHtml);
+        }
+
+        // Load sales report
+        function loadSalesReport() {
+            const period = $('#periodSelect').val();
+            
+            fetch(`/admin/reports/sales?period=${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        displaySalesReport(data.salesData);
+                    } else {
+                        showError('Không thể tải báo cáo doanh thu: ' + (data.error || 'Lỗi không xác định'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Có lỗi xảy ra khi tải báo cáo doanh thu');
+                });
+        }
+
+        // Display sales report
+        function displaySalesReport(salesData) {
+            const periodNames = {
+                'today': 'Hôm nay',
+                'week': '7 ngày qua',
+                'month': '30 ngày qua',
+                'year': '1 năm qua'
+            };
+
+            const html = `
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Doanh thu ${periodNames[salesData.period]}</h5>
+                                <h2 class="text-success">${formatCurrency(salesData.revenue)}</h2>
+                                <small class="text-muted">
+                                    Từ ${new Date(salesData.startDate).toLocaleDateString('vi-VN')} 
+                                    đến ${new Date(salesData.endDate).toLocaleDateString('vi-VN')}
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>Thông tin chi tiết:</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fa fa-calendar text-primary"></i> Khoảng thời gian: ${periodNames[salesData.period]}</li>
+                                    <li><i class="fa fa-money-bill text-success"></i> Tổng doanh thu: ${formatCurrency(salesData.revenue)}</li>
+                                    <li><i class="fa fa-chart-line text-info"></i> Xu hướng: ${salesData.revenue > 0 ? 'Tích cực' : 'Cần cải thiện'}</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+            $('#sales-report').html(html);
+        }
+
+        // Utility functions
+        function formatCurrency(amount) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(amount);
+        }
+
+        function showError(message) {
+            const errorHtml = `
+                <div class="col-12">
+                    <div class="alert alert-danger">
+                        <i class="fa fa-exclamation-triangle"></i> ${message}
+                    </div>
+                </div>
+            `;
+            $('#dashboard-stats').html(errorHtml);
+        }
+    </script>
+</body>
+</html>

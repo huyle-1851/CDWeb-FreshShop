@@ -3071,3 +3071,36 @@ input.form-control.is-invalid.input-style {
 
 
 
+
+/* Cart message animations */
+@keyframes slideInRight {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOutRight {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+.cart-message {
+    background-color: #28a745;
+    color: white;
+    border: none;
+}
+
+.cart-message.alert-info {
+    background-color: #17a2b8;
+}

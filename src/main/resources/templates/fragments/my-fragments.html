@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
-<div th:fragment="header(currentPage)" style="margin: 0" th:with="username = ${#ctx.session.username}">
+<div th:fragment="header(currentPage)" style="margin: 0" th:with="username = ${session.username}">
     <!-- Start Main Header -->
     <header class="main-header">
         <!-- Start Navigation -->
@@ -12,7 +12,9 @@
                             aria-controls="navbars-rs-food" aria-expanded="false" aria-label="Toggle navigation">
                         <i class="fa fa-bars"></i>
                     </button>
-                    <a class="navbar-brand" href="home"><img src="images/logo.png" class="logo" alt=""></a>
+                    <a class="navbar-brand" th:href="@{/home}">
+                        <img th:src="@{/images/logo.png}" class="logo" alt="">
+                    </a>
                 </div>
                 <!-- End Header Navigation -->
 
@@ -42,15 +44,109 @@
                 <div class="attr-nav">
                     <ul>
                         <li class="search"><a href="#"><i class="fa fa-search"></i></a></li>
-                        <th:block th:if="${cart} != null">
-                            <li class="side-menu">
-                                <a href="cart">
-                                    <i class="fa fa-shopping-bag"></i>
-                                    <span class="badge">${cart.size()}</span>
-                                    <p>Giỏ hàng</p>
-                                </a>
-                            </li>
-                        </th:block>
+                        <!-- Cart dropdown - working version -->
+                        <li class="side-menu cart-dropdown" style="position: relative; display: inline-block; list-style: none;">
+                            <button onclick="toggleCartDropdownWorking()" style="
+                                background: none;
+                                border: none;
+                                color: inherit;
+                                cursor: pointer;
+                                padding: 0;
+                                font: inherit;
+                                text-align: center;
+                                display: flex;
+                                flex-direction: column;
+                                align-items: center;
+                                position: relative;
+                            " id="cart-toggle">
+                                <i class="fa fa-shopping-bag" style="font-size: 18px; margin-bottom: 5px;"></i>
+                                <span class="badge" id="cart-badge" th:text="${cart != null ? #lists.size(cart) : 0}" style="
+                                    position: absolute;
+                                    top: -5px;
+                                    right: -5px;
+                                    background: #b0b435;
+                                    color: white;
+                                    border-radius: 50%;
+                                    padding: 2px 6px;
+                                    font-size: 10px;
+                                    min-width: 16px;
+                                    height: 16px;
+                                    display: flex;
+                                    align-items: center;
+                                    justify-content: center;
+                                ">0</span>
+                                <p style="margin: 0; font-size: 12px;">Giỏ hàng</p>
+                            </button>
+                            <!-- Working cart dropdown -->
+                            <div id="cart-dropdown-working" style="
+                                position: absolute;
+                                top: 100%;
+                                right: 0;
+                                width: 350px;
+                                background: white;
+                                border: 1px solid #ddd;
+                                border-radius: 8px;
+                                box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+                                z-index: 10000;
+                                margin-top: 10px;
+                                display: none;
+                                font-family: Arial, sans-serif;
+                            ">
+                                <!-- Header -->
+                                <div style="padding: 15px; border-bottom: 1px solid #eee; background: #f8f9fa; border-radius: 8px 8px 0 0;">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <h5 style="margin: 0; font-size: 16px; font-weight: 600; color: #333;">🛒 Giỏ hàng</h5>
+                                        <button onclick="hideCartDropdownWorking()" style="
+                                            background: none;
+                                            border: none;
+                                            font-size: 18px;
+                                            cursor: pointer;
+                                            color: #666;
+                                            padding: 0;
+                                            width: 20px;
+                                            height: 20px;
+                                        ">×</button>
+                                    </div>
+                                    <span id="cart-count-working" style="font-size: 12px; color: #666;">0 sản phẩm</span>
+                                </div>
+
+                                <!-- Body -->
+                                <div id="cart-items-working" style="max-height: 250px; overflow-y: auto; padding: 15px;">
+                                    <div style="text-align: center; color: #666; padding: 20px;">
+                                        <i class="fa fa-shopping-cart" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i>
+                                        <p style="margin: 0;">Giỏ hàng trống</p>
+                                    </div>
+                                </div>
+
+                                <!-- Footer -->
+                                <div style="padding: 15px; border-top: 1px solid #eee; background: #f8f9fa; border-radius: 0 0 8px 8px;">
+                                    <div style="display: flex; gap: 8px;">
+                                        <a th:href="@{/cart}" style="
+                                            flex: 1;
+                                            background: #007bff;
+                                            color: white;
+                                            text-decoration: none;
+                                            padding: 8px 12px;
+                                            border-radius: 4px;
+                                            text-align: center;
+                                            font-size: 12px;
+                                        ">Xem giỏ hàng</a>
+                                        <button onclick="clearCartWorking()" style="
+                                            flex: 1;
+                                            background: #dc3545;
+                                            color: white;
+                                            border: none;
+                                            padding: 8px 12px;
+                                            border-radius: 4px;
+                                            cursor: pointer;
+                                            font-size: 12px;
+                                        ">Xóa tất cả</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+
                     </ul>
                 </div>
                 <!-- End Atribute Navigation -->
@@ -66,53 +162,36 @@
                             <ul class="dropdown-menu">
 
                                 <th:block th:if="${username == null}">
-                                    <li><a href="login"><strong>Đăng nhập</strong></a></li>
-                                    <li><a href="register"><strong>Đăng ký</strong></a></li>
+                                    <li><a th:href="@{/login}"><strong>Đăng nhập</strong></a></li>
+                                    <li><a th:href="@{/register}"><strong>Đăng ký</strong></a></li>
                                 </th:block>
                                 <th:block th:if="${username != null}">
-                                    <li><a href="cart"><strong>Giỏ hàng</strong></a></li>
-                                    <li><a href="#"><strong>Tài khoản</strong></a></li>
-                                    <li><a href="logout"><strong>Đăng xuất</strong></a></li>
+                                    <li><a th:href="@{/cart}"><strong>Giỏ hàng</strong></a></li>
+                                    <li><a th:href="@{/my-account}"><strong>Tài khoản</strong></a></li>
+                                    <!-- Admin Dashboard Link (only visible for admin users) -->
+                                    <li th:if="${session.isAdmin}">
+                                        <a th:href="@{/admin/dashboard}" style="color: #28a745; font-weight: bold;">
+                                            <i class="fa fa-cog" style="margin-right: 8px;"></i>
+                                            <strong>Quản lý hệ thống</strong>
+                                        </a>
+                                    </li>
+                                    <li class="divider" th:if="${session.isAdmin}"></li>
+                                    <li>
+                                        <form action="/logout" method="post" style="margin: 0; padding: 0;">
+                                            <button type="submit" style="background: none; border: none; padding: 3px 20px; display: block; width: 100%; text-align: left; color: inherit; text-decoration: none; cursor: pointer; font-weight: normal; font-size: inherit; line-height: 1.42857143; transition: background-color 0.3s ease;"
+                                                    onmouseover="this.style.backgroundColor='#f5f5f5'"
+                                                    onmouseout="this.style.backgroundColor='transparent'">
+                                                <strong>Đăng xuất</strong>
+                                            </button>
+                                        </form>
+                                    </li>
                                 </th:block>
                             </ul>
                         </li>
                     </ul>
                 </div>
             </div>
-            <!-- Start Side Menu -->
-            <!--        <div class="side">-->
-            <!--            <a href="#" class="close-side"><i class="fa fa-times"></i></a>-->
-            <!--            <li class="cart-box">-->
-            <!--                <ul class="cart-list" id="cartSmall">-->
-            <!--                    <c:forEach items="${cart}" var="item" varStatus="index">-->
-            <!--                        <c:set var="check"-->
-            <!--                               value="${item.getProduct().getDiscountedPrice()==0||item.getProduct().getDiscountedPrice()==item.getProduct().getPrice()}"/>-->
-            <!--                        <c:set var="price" value="0"/>-->
-            <!--                        <c:if test="${check}">-->
-            <!--                            <c:set var="price"-->
-            <!--                                   value="${item.getProduct().getPrice()}"/>-->
-            <!--                        </c:if>-->
-            <!--                        <c:if test="${!check}">-->
-            <!--                            <c:set var="price"-->
-            <!--                                   value="${item.getProduct().getDiscountedPrice()}"/>-->
-            <!--                        </c:if>-->
-            <!--                        <li>-->
-            <!--                            <a class="photo"><img src="${item.getProduct().getImages()[0]}" class="cart-thumb" alt=""/></a>-->
-            <!--                            <h6><a href="#">${item.getProduct().getName()} </a></h6>-->
-            <!--                            <p>${item.getQuantity()}x - <span class="price">${price}</span></p>-->
-            <!--                        </li>-->
-            <!--                    </c:forEach>-->
-            <!--                    <%&#45;&#45;-->
-            <!--                    <li class="total">&#45;&#45;%>-->
-            <!--                        <a href="cart" class="btn btn-default hvr-hover btn-cart">VIEW CART</a>-->
-            <!--                        <%&#45;&#45; <span class="float-right"><strong>Total</strong>: $180.00</span>&#45;&#45;%>-->
-            <!--                        <%&#45;&#45;-->
-            <!--                    </li>-->
-            <!--                    &#45;&#45;%>-->
-            <!--                </ul>-->
-            <!--            </li>-->
-            <!--        </div>-->
-            <!-- End Side Menu -->
+
         </nav>
         <!-- End Navigation -->
     </header>
@@ -224,7 +303,7 @@
 
     <!-- Start copyright  -->
     <div class="footer-copyright">
-        <p class="footer-company">All Rights Reserved. &copy; 2018 <a href="#">ThewayShop</a> Thiết kế bởi:
+        <p class="footer-company">All Rights Reserved. &copy; 2025 <a href="#">ThewayShop</a> Thiết kế bởi:
             <a href="https://html.design/">html design</a></p>
     </div>
     <!-- End copyright  -->
@@ -241,40 +320,399 @@
     <title>Fresh Shop</title>
 
     <!-- Site Icons -->
-    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
-    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 
     <!-- Site CSS -->
-    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Responsive CSS -->
-    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 
     <script th:src="@{https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js}"></script>
+
+    <!-- Cart Dropdown JavaScript -->
+    <script>
+        // Working cart dropdown functions
+        function toggleCartDropdownWorking() {
+            console.log('Cart button clicked - working version');
+            var dropdown = document.getElementById('cart-dropdown-working');
+
+            if (dropdown.style.display === 'block') {
+                hideCartDropdownWorking();
+            } else {
+                showCartDropdownWorking();
+            }
+        }
+
+        function showCartDropdownWorking() {
+            console.log('Showing cart dropdown');
+            var dropdown = document.getElementById('cart-dropdown-working');
+            dropdown.style.display = 'block';
+
+            // Load cart items
+            loadCartItemsWorking();
+        }
+
+        function hideCartDropdownWorking() {
+            console.log('Hiding cart dropdown');
+            var dropdown = document.getElementById('cart-dropdown-working');
+            dropdown.style.display = 'none';
+        }
+
+        function loadCartItemsWorking() {
+            console.log('Loading cart items...');
+            var container = document.getElementById('cart-items-working');
+            var countDisplay = document.getElementById('cart-count-working');
+
+            // Show loading
+            container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;"><i class="fa fa-spinner fa-spin"></i> Đang tải...</div>';
+
+            // Fetch cart data from correct endpoint
+            fetch('/api/cart/items')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Cart API not available');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Cart data received:', data);
+                    if (data.success) {
+                        displayCartItemsWorking(data.items, data.total, data.count);
+                    } else {
+                        console.error('Cart API error:', data.error);
+                        displayCartItemsWorking([], 0, 0);
+                    }
+                })
+                .catch(error => {
+                    console.log('Cart API error:', error);
+                    displayCartItemsWorking([], 0, 0);
+                });
+        }
+
+        function displayCartItemsWorking(cartItems, total, count) {
+            var container = document.getElementById('cart-items-working');
+            var countDisplay = document.getElementById('cart-count-working');
+
+            if (!cartItems || cartItems.length === 0) {
+                container.innerHTML = '<div style="text-align: center; color: #666; padding: 20px;"><i class="fa fa-shopping-cart" style="font-size: 24px; margin-bottom: 10px; opacity: 0.5;"></i><p style="margin: 0;">Giỏ hàng trống</p></div>';
+                countDisplay.innerHTML = '0 sản phẩm';
+                updateCartBadgeWorking(0);
+                return;
+            }
+
+            var html = '';
+            cartItems.forEach(function(item, index) {
+                var product = item.product;
+                var imageUrl = null;
+
+                // Get first image if available
+                if (product.images && product.images.length > 0) {
+                    imageUrl = product.images[0].url;
+                }
+
+                var price = product.discountedPrice > 0 && product.discountedPrice !== product.price
+                    ? product.discountedPrice
+                    : product.price;
+                var itemTotal = price * item.quantity;
+
+                html += '<div style="display: flex; align-items: center; padding: 10px 0; border-bottom: 1px solid #f0f0f0;">';
+
+                // Product image
+                if (imageUrl) {
+                    html += '<img src="' + imageUrl + '" alt="' + product.name + '" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px; margin-right: 10px;">';
+                } else {
+                    html += '<div style="width: 50px; height: 50px; background: #f8f9fa; border-radius: 4px; margin-right: 10px; display: flex; align-items: center; justify-content: center; color: #666;"><i class="fa fa-image"></i></div>';
+                }
+
+                // Product details
+                html += '<div style="flex: 1;">';
+                html += '<h6 style="margin: 0 0 5px 0; font-size: 14px; color: #333;">' + product.name + '</h6>';
+                html += '<p style="margin: 0; font-size: 12px; color: #666;">Số lượng: ' + item.quantity + '</p>';
+                html += '<p style="margin: 0; font-size: 12px; color: #b0b435; font-weight: 600;">' + formatPrice(itemTotal) + '</p>';
+                html += '</div>';
+
+                // Remove button
+                html += '<button onclick="removeCartItemWorking(' + product.id + ')" style="background: #dc3545; color: white; border: none; padding: 4px 8px; border-radius: 3px; cursor: pointer; font-size: 12px;">Xóa</button>';
+                html += '</div>';
+            });
+
+            container.innerHTML = html;
+            countDisplay.innerHTML = count + ' sản phẩm';
+            updateCartBadgeWorking(count);
+        }
+
+        function removeCartItemWorking(productId) {
+            console.log('Removing item with product ID:', productId);
+
+            // Create form data
+            var formData = new FormData();
+            formData.append('idP', productId);
+
+            fetch('/remove-item-cart', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.text())
+            .then(data => {
+                console.log('Item removed:', data);
+                // Reload cart items
+                loadCartItemsWorking();
+            })
+            .catch(error => {
+                console.error('Error removing item:', error);
+            });
+        }
+
+        function clearCartWorking() {
+            if (confirm('Bạn có chắc chắn muốn xóa tất cả sản phẩm khỏi giỏ hàng?')) {
+                console.log('Clearing cart');
+
+                fetch('/clear-cart', {
+                    method: 'POST'
+                })
+                .then(response => response.text())
+                .then(data => {
+                    console.log('Cart cleared:', data);
+                    // Reload cart items
+                    loadCartItemsWorking();
+                })
+                .catch(error => {
+                    console.error('Error clearing cart:', error);
+                });
+            }
+        }
+
+        function updateCartBadgeWorking(count) {
+            var badge = document.getElementById('cart-badge');
+            if (badge) {
+                badge.textContent = count || 0;
+            }
+        }
+
+        function formatPrice(price) {
+            return new Intl.NumberFormat('vi-VN', {
+                style: 'currency',
+                currency: 'VND'
+            }).format(price);
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            var dropdown = document.getElementById('cart-dropdown-working');
+            var cartToggle = document.getElementById('cart-toggle');
+
+            if (dropdown && cartToggle && dropdown.style.display === 'block') {
+                if (!dropdown.contains(event.target) && !cartToggle.contains(event.target)) {
+                    hideCartDropdownWorking();
+                }
+            }
+        });
+    </script>
+
+    <!-- Cart Dropdown Styles -->
+    <style>
+
+        .attr-nav .cart-dropdown-header {
+            padding: 15px !important;
+            border-bottom: 1px solid #eee !important;
+            background: #f8f9fa !important;
+            border-radius: 8px 8px 0 0 !important;
+            margin: 0 !important;
+            display: block !important;
+        }
+
+        .attr-nav .cart-dropdown-header h5 {
+            margin: 0 !important;
+            font-size: 16px !important;
+            font-weight: 600 !important;
+            color: #333 !important;
+            display: block !important;
+        }
+
+        .attr-nav .cart-count {
+            font-size: 12px !important;
+            color: #666 !important;
+            display: block !important;
+            margin: 5px 0 0 0 !important;
+        }
+
+        .attr-nav .cart-dropdown-body {
+            max-height: 250px !important;
+            overflow-y: auto !important;
+            display: block !important;
+        }
+
+        .attr-nav .cart-item {
+            display: flex !important;
+            align-items: center !important;
+            padding: 10px 15px !important;
+            border-bottom: 1px solid #f0f0f0 !important;
+            margin: 0 !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .attr-nav .cart-item:last-child {
+            border-bottom: none !important;
+        }
+
+        .cart-item-image {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 4px;
+            margin-right: 10px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 500;
+            margin: 0 0 5px 0;
+            color: #333;
+        }
+
+        .cart-item-price {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .cart-item-quantity {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .cart-item-remove {
+            background: none;
+            border: none;
+            color: #dc3545;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 3px;
+        }
+
+        .cart-item-remove:hover {
+            background: #f8f9fa;
+        }
+
+        .cart-dropdown-footer {
+            padding: 15px;
+            border-top: 1px solid #eee;
+            background: #f8f9fa;
+            border-radius: 0 0 8px 8px;
+        }
+
+        .cart-total {
+            font-weight: 600;
+            margin-bottom: 10px;
+            text-align: center;
+            color: #333;
+        }
+
+        .cart-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .cart-actions .btn {
+            flex: 1;
+            font-size: 12px;
+            padding: 6px 12px;
+        }
+
+        .cart-empty {
+            padding: 30px 15px;
+            text-align: center;
+            color: #666;
+        }
+
+        .cart-loading {
+            padding: 20px;
+            text-align: center;
+            color: #666;
+        }
+
+        /* Animation */
+        .attr-nav .cart-dropdown-menu {
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+
+        .attr-nav .cart-dropdown-menu.show {
+            opacity: 1;
+            transform: translateY(0);
+            display: block !important;
+            pointer-events: auto;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .attr-nav .cart-dropdown-menu {
+                width: 300px;
+                right: -50px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .attr-nav .cart-dropdown-menu {
+                width: 280px;
+                right: -100px;
+            }
+        }
+
+        /* Cart message animations */
+        @keyframes slideInRight {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes slideOutRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+        }
+    </style>
 
 </div>
 
 <div th:fragment="script">
     <!-- ALL JS FILES -->
     <script src="js/jquery-3.2.1.min.js" th:src="@{/js/jquery-3.2.1.min.js}"></script>
-    <script src="js/popper.min.js" th:src="@{js/popper.min.js}"></script>
-    <script src="js/bootstrap.min.js" th:src="@{js/bootstrap.min.js}"></script>
+    <script src="js/popper.min.js" th:src="@{/js/popper.min.js}"></script>
+    <script src="js/bootstrap.min.js" th:src="@{/js/bootstrap.min.js}"></script>
     <!-- ALL PLUGINS -->
-    <script src="js/jquery.superslides.min.js" th:src="@{js/jquery.superslides.min.js}"></script>
-    <script src="js/bootstrap-select.js" th:src="@{js/bootstrap-select.js}"></script>
-    <script src="js/inewsticker.js" th:src="@{js/inewsticker.js}"></script>
-    <script src="js/bootsnav.js" th:src="@{js/bootsnav.js}"></script>
-    <script src="js/images-loded.min.js" th:src="@{js/images-loded.min.js}"></script>
-    <script src="js/isotope.min.js" th:src="@{js/isotope.min.js}"></script>
-    <script src="js/owl.carousel.min.js" th:src="@{js/owl.carousel.min.js}"></script>
-    <script src="js/baguetteBox.min.js" th:src="@{js/baguetteBox.min.js}"></script>
-    <script src="js/form-validator.min.js" th:src="@{js/form-validator.min.js}"></script>
-    <script src="js/contact-form-script.js" th:src="@{js/contact-form-script.js}"></script>
-    <script src="js/custom.js" th:src="@{js/custom.js}"></script>
-    <script src="js/myjs.js" th:src="@{js/myjs.js}"></script>
+    <script src="js/jquery.superslides.min.js" th:src="@{/js/jquery.superslides.min.js}"></script>
+    <script src="js/bootstrap-select.js" th:src="@{/js/bootstrap-select.js}"></script>
+    <script src="js/inewsticker.js" th:src="@{/js/inewsticker.js}"></script>
+    <script src="js/bootsnav.js" th:src="@{/js/bootsnav.js}"></script>
+    <script src="js/images-loded.min.js" th:src="@{/js/images-loded.min.js}"></script>
+    <script src="js/isotope.min.js" th:src="@{/js/isotope.min.js}"></script>
+    <script src="js/owl.carousel.min.js" th:src="@{/js/owl.carousel.min.js}"></script>
+    <script src="js/baguetteBox.min.js" th:src="@{/js/baguetteBox.min.js}"></script>
+    <script src="js/form-validator.min.js" th:src="@{/js/form-validator.min.js}"></script>
+    <script src="js/contact-form-script.js" th:src="@{/js/contact-form-script.js}"></script>
+    <script src="js/custom.js" th:src="@{/js/custom.js}"></script>
+    <script src="js/myjs.js" th:src="@{/js/myjs.js}"></script>
 </div>
-

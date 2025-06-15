@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta http-equiv="content-type" content="text/html" charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <title>Admin Dashboard - Fresh Shop</title>
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
+
+    <!-- Site CSS -->
+    <link rel="stylesheet" th:href="@{/css/style.css}">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
+</head>
+<body>
+<div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
+
+<!-- Start Admin Dashboard -->
+<div class="container mt-5 mb-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-center mb-4">Admin Dashboard</h2>
+        </div>
+    </div>
+    
+    <!-- Admin Stats -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Total Users</h5>
+                    <h3 class="text-primary" th:text="${#lists.size(users)}">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Admin Users</h5>
+                    <h3 class="text-success" th:text="${#lists.size(users.?[role.name() == 'ADMIN'])}">0</h3>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title">Regular Users</h5>
+                    <h3 class="text-info" th:text="${#lists.size(users.?[role.name() == 'USER'])}">0</h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">
+                        <i class="fa fa-bolt mr-2"></i>
+                        Thao tác nhanh
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <a href="/admin/products" class="btn btn-primary btn-lg btn-block">
+                                <i class="fa fa-box"></i>
+                                <br>
+                                Quản lý sản phẩm
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/orders" class="btn btn-info btn-lg btn-block">
+                                <i class="fa fa-shopping-cart"></i>
+                                <br>
+                                Quản lý đơn hàng
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/categories" class="btn btn-warning btn-lg btn-block">
+                                <i class="fa fa-tags"></i>
+                                <br>
+                                Quản lý danh mục
+                            </a>
+                        </div>
+                        <div class="col-md-3">
+                            <a href="/admin/reports" class="btn btn-secondary btn-lg btn-block">
+                                <i class="fa fa-chart-bar"></i>
+                                <br>
+                                Báo cáo
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- User Management -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4>User Management</h4>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr th:each="user : ${users}">
+                                    <td th:text="${user.id}">1</td>
+                                    <td th:text="${user.username}">username</td>
+                                    <td th:text="${user.email}">email@example.com</td>
+                                    <td th:text="${user.firstname + ' ' + user.lastname}">Full Name</td>
+                                    <td>
+                                        <span th:if="${user.role.name() == 'ADMIN'}" class="badge badge-success">ADMIN</span>
+                                        <span th:if="${user.role.name() == 'USER'}" class="badge badge-primary">USER</span>
+                                    </td>
+                                    <td>
+                                        <button th:if="${user.role.name() == 'USER'}" 
+                                                class="btn btn-sm btn-warning promote-btn" 
+                                                th:data-username="${user.username}">
+                                            Promote to Admin
+                                        </button>
+                                        <span th:if="${user.role.name() == 'ADMIN'}" class="text-muted">Admin</span>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- End Admin Dashboard -->
+
+<div th:replace="~{fragments/my-fragments.html::footer}"/>
+
+<!-- JavaScript for promote functionality -->
+<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script>
+$(document).ready(function() {
+    $('.promote-btn').click(function() {
+        var username = $(this).data('username');
+        var button = $(this);
+        
+        if (confirm('Are you sure you want to promote ' + username + ' to admin?')) {
+            $.post('/admin/promote-user', {
+                username: username
+            })
+            .done(function(response) {
+                alert('User promoted successfully!');
+                location.reload();
+            })
+            .fail(function(xhr) {
+                alert('Error: ' + xhr.responseText);
+            });
+        }
+    });
+});
+
+
+</script>
+
+</body>
+</html>

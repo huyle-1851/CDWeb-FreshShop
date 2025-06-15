@@ -8,63 +8,171 @@
     <title>Fresh Shop</title>
 
     <!-- Site Icons -->
-    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
-    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 
     <!-- Site CSS -->
-    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Responsive CSS -->
-    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
 <div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
 
-<!-- Start Slider -->
-<div id="slides-shop" class="cover-slides">
-    <ul class="slides-container">
-        <li class="text-center">
-<!--            <img th:src="images/banner-01.jpg" alt="">-->
-            <img src="/images/banner-01.jpg" alt="" th:src="@{/images/banner-01.jpg}">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
-                        <p class="m-b-40">-----------------------</p>
-                    </div>
-                </div>
-            </div>
-        </li>
-        <li class="text-center">
-            <img src="images/banner-02.jpg" alt="">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
-                        <p class="m-b-40">-----------------------</p>
-                    </div>
-                </div>
-            </div>
-        </li>
-        <li class="text-center">
-            <img src="images/banner-03.jpg" alt="">
-            <div class="container">
-                <div class="row">
-                    <div class="col-md-12">
-                        <h1 class="m-b-20"><strong>Chào mừng đến với <br> FruitShop</strong></h1>
-                        <p class="m-b-40">-----------------------</p>
-                    </div>
-                </div>
-            </div>
-        </li>
-    </ul>
-    <div class="slides-navigation">
-        <a href="#" class="next"><i class="fa fa-angle-right" aria-hidden="true"></i></a>
-        <a href="#" class="prev"><i class="fa fa-angle-left" aria-hidden="true"></i></a>
+<!-- Start Slider - Working Slideshow Version -->
+<div id="homepage-slider" style="
+    width: 100%;
+    height: 100vh;
+    min-height: 500px;
+    position: relative;
+    overflow: hidden;
+">
+    <!-- Slide 1 -->
+    <div class="slide-item active" style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/banner-01.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 1;
+        transition: opacity 1s ease-in-out;
+    ">
+        <div style="text-align: center; color: white !important; z-index: 3; position: relative;">
+            <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); color: white !important;">
+                Chào mừng đến với<br>FreshShop
+            </h1>
+            <p style="font-size: 18px; margin-bottom: 40px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: white !important;">
+                -----------------------
+            </p>
+        </div>
+        <!-- Dark overlay for better text readability -->
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 2;
+        "></div>
+    </div>
+
+    <!-- Slide 2 -->
+    <div class="slide-item" style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/banner-02.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    ">
+        <div style="text-align: center; color: white !important; z-index: 3; position: relative;">
+            <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); color: white !important;">
+                Chào mừng đến với<br>FreshShop
+            </h1>
+            <p style="font-size: 18px; margin-bottom: 40px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: white !important;">
+                -----------------------
+            </p>
+        </div>
+        <!-- Dark overlay for better text readability -->
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 2;
+        "></div>
+    </div>
+
+    <!-- Slide 3 -->
+    <div class="slide-item" style="
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: url('/images/banner-03.jpg');
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        transition: opacity 1s ease-in-out;
+    ">
+        <div style="text-align: center; color: white !important; z-index: 3; position: relative;">
+            <h1 style="font-size: 48px; font-weight: bold; margin-bottom: 20px; text-shadow: 2px 2px 4px rgba(0,0,0,0.8); color: white !important;">
+                Chào mừng đến với<br>FreshShop
+            </h1>
+            <p style="font-size: 18px; margin-bottom: 40px; text-shadow: 1px 1px 2px rgba(0,0,0,0.8); color: white !important;">
+                -----------------------
+            </p>
+        </div>
+        <!-- Dark overlay for better text readability -->
+        <div style="
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.4);
+            z-index: 2;
+        "></div>
+    </div>
+
+    <!-- Navigation arrows -->
+    <div style="position: absolute; top: 50%; transform: translateY(-50%); z-index: 10; width: 100%;">
+        <button onclick="prevSlide()" style="
+            position: absolute;
+            left: 20px;
+            background: rgba(176, 180, 53, 0.8);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='rgba(176, 180, 53, 1)'" onmouseout="this.style.background='rgba(176, 180, 53, 0.8)'">
+            <i class="fa fa-angle-left"></i>
+        </button>
+        <button onclick="nextSlide()" style="
+            position: absolute;
+            right: 20px;
+            background: rgba(176, 180, 53, 0.8);
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 18px;
+            transition: background 0.3s ease;
+        " onmouseover="this.style.background='rgba(176, 180, 53, 1)'" onmouseout="this.style.background='rgba(176, 180, 53, 0.8)'">
+            <i class="fa fa-angle-right"></i>
+        </button>
     </div>
 </div>
 <!-- End Slider -->
@@ -74,12 +182,12 @@
         <div class="row">
             <div class="col-lg-6 col-md-6 col-sm-12">
                 <div class="offer-box-products">
-                    <img class="img-fluid" src="images/add-img-01.jpg" alt=""/>
+                    <img class="img-fluid" th:src="@{/images/add-img-01.jpg}" alt=""/>
                 </div>
             </div>
             <div class="col-lg-6 col-md-6 col-sm-12">
                 <div class="offer-box-products">
-                    <img class="img-fluid" src="images/add-img-02.jpg" alt=""/>
+                    <img class="img-fluid" th:src="@{/images/add-img-02.jpg}" alt=""/>
                 </div>
             </div>
         </div>
@@ -108,20 +216,16 @@
                 </div>
             </div>
         </div>
-        <div class="row special-list">
-            <div th:each="item, state: ${listAllProduct}" th:if="${state.index < 3}"
-                 class="col-lg-3 col-md-6 special-grid best-seller">
+<div th:each="item, state: ${listAllProduct}" th:if="${state.index < 3}"
+     class="col-lg-3 col-md-6 special-grid best-seller">
                 <div class="products-single fix">
                     <div class="box-img-hover">
                         <div class="type-lb">
 
-                            <p th:if="${item.getStatus()} != null" class="sale">
-                                ${item.getStatus()}
-                            </p>
+                            <p th:if="${item.status != null}" class="sale" th:text="${item.status}"></p>
                         </div>
                         <div style="width: 255px; height: 241px">
-                            <img src="<c:out value='${item.getImages()[0]}' default=''/>" class="img-fluid"
-                                 alt="Image">
+                            <img th:src="${item.images[0]}" class="img-fluid" alt="Image">
                         </div>
                         <div class="mask-icon"
                              th:with="check=${item.getDiscountedPrice()==0||item.getDiscountedPrice()==item.getPrice()},price=0">
@@ -135,23 +239,20 @@
                             </th:block>
                             <th:block th:if="${username!=null}">
                                 <a class="cart" style="cursor: pointer"
-                                   onclick="updateCart('${item.getId()}');
-                                   alert('Đã thêm sản phẩm');">
+                                   th:onclick="'updateCart(\'' + ${item.id} + '\'); showCartMessage(\'Sản phẩm đã được thêm vào giỏ hàng!\', \'success\');'">
                                     Thêm vào giỏ</a>
                             </th:block>
                             <th:block th:if="${username==null}">
                                 <a class="cart" style="cursor: pointer"
-                                   onclick="updateCart('${item.getId()}');
-                                        alert('Vui lòng đăng nhập trước');
-                                        window.location.href='login';">
+                                   th:onclick="'showCartMessage(\'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!\', \'info\'); setTimeout(function() { window.location.href=\'/login\'; }, 1500);'">
                                     Thêm vào giỏ</a>
                             </th:block>
                         </div>
                     </div>
-                    <a href="product-detail?id=${item.getId()}" style="cursor: pointer;">
+                    <a th:href="@{/product-detail(id=${item.id})}" style="cursor: pointer;">
                         <div class="why-text">
-                            <h4>${item.getName()}</h4>
-                            <h5>${item.getPrice()}đ</h5>
+                            <h4 th:text="${item.name}"></h4>
+                            <h5 th:text="${item.price} + 'đ'"></h5>
                         </div>
                     </a>
                 </div>
@@ -162,5 +263,87 @@
 <!-- End Products -->
 
 <div th:replace="~{fragments/my-fragments.html::footer}"/>
+<div th:replace="~{fragments/my-fragments.html::script}"/>
+
+<script>
+// Working slideshow JavaScript
+let currentSlideIndex = 0;
+const slides = document.querySelectorAll('.slide-item');
+const totalSlides = slides.length;
+
+function showSlide(index) {
+    // Hide all slides
+    slides.forEach((slide, i) => {
+        if (i === index) {
+            slide.style.opacity = '1';
+            slide.classList.add('active');
+        } else {
+            slide.style.opacity = '0';
+            slide.classList.remove('active');
+        }
+    });
+}
+
+function nextSlide() {
+    currentSlideIndex = (currentSlideIndex + 1) % totalSlides;
+    showSlide(currentSlideIndex);
+    console.log('Next slide:', currentSlideIndex);
+}
+
+function prevSlide() {
+    currentSlideIndex = (currentSlideIndex - 1 + totalSlides) % totalSlides;
+    showSlide(currentSlideIndex);
+    console.log('Previous slide:', currentSlideIndex);
+}
+
+// Initialize slideshow
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Homepage slideshow initializing...');
+    console.log('Found', totalSlides, 'slides');
+
+    if (totalSlides > 0) {
+        // Show first slide
+        showSlide(0);
+        console.log('First slide shown');
+
+        // Auto-advance slides every 5 seconds
+        setInterval(nextSlide, 5000);
+        console.log('Auto-advance started (5 seconds)');
+    }
+
+    // Initialize product filter if available
+    setTimeout(function() {
+        try {
+            if (typeof $ !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
+                $('.special-grid').isotope({
+                    itemSelector: '.special-grid',
+                    layoutMode: 'fitRows'
+                });
+                console.log('Isotope initialized successfully');
+            } else {
+                console.log('jQuery or Isotope not available');
+            }
+        } catch (e) {
+            console.log('Isotope initialization error:', e);
+        }
+    }, 1000);
+});
+
+// Simple filter function
+function x() {
+    console.log('Filter function called');
+    try {
+        if (typeof $ !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
+            $('.special-grid').isotope({ filter: '*' });
+            console.log('Filter applied successfully');
+        } else {
+            console.log('jQuery or Isotope not available for filtering');
+        }
+    } catch (e) {
+        console.log('Filter error:', e);
+    }
+}
+</script>
+
 </body>
 </html>

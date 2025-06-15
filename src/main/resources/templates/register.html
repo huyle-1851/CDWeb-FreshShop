@@ -8,18 +8,18 @@
     <title>Fresh Shop</title>
 
     <!-- Site Icons -->
-    <link rel="shortcut icon" th:href="@{images/favicon.ico}" type="image/x-icon">
-    <link rel="apple-touch-icon" th:href="@{images/apple-touch-icon.png}">
+    <link rel="shortcut icon" th:href="@{/images/favicon.ico}" type="image/x-icon">
+    <link rel="apple-touch-icon" th:href="@{/images/apple-touch-icon.png}">
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" th:href="@{/css/bootstrap.min.css}">
 
     <!-- Site CSS -->
-    <link rel="stylesheet" th:href="@{css/style.css}">
+    <link rel="stylesheet" th:href="@{/css/style.css}">
     <!-- Responsive CSS -->
-    <link rel="stylesheet" th:href="@{css/responsive.css}">
+    <link rel="stylesheet" th:href="@{/css/responsive.css}">
     <!-- Custom CSS -->
-    <link rel="stylesheet" th:href="@{css/custom.css}">
+    <link rel="stylesheet" th:href="@{/css/custom.css}">
 </head>
 <body>
 <div th:replace="~{fragments/my-fragments.html::header(${currentPage})}"/>
@@ -29,26 +29,118 @@
         <div class="row justify-content-center">
             <div class="col-lg-5 col-md-5 col-12">
 
-                <form class="was-validated" action="register" method="post">
+                <form id="registerForm">
                     <h1 class="mb-4" style="text-align: center;">Đăng Ký</h1>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Họ và tên đệm" required name="lastname">
-                    <div class="invalid-feedback error">${errors.lastname}</div>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Tên" required name="firstname">
-                    <div class="invalid-feedback error">${errors.firstname}</div>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Số điện thoại" required name="phone">
-                    <div class="invalid-feedback error" maxlength="10">${errors.phone}</div>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Địa chỉ" required name="address">
-                    <div class="invalid-feedback error">${errors.address}</div>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Tên Tài Khoản" required name="usernameIn">
-                    <div class="invalid-feedback error">${errors.username}</div>
-                    <input type="text" class="form-control is-invalid input-style" placeholder="Email" required name="email">
-                    <div class="invalid-feedback error">${errors.email}</div>
-                    <input type="password" class="form-control is-invalid input-style" placeholder="Mật khẩu" required name="password">
-                    <div class="invalid-feedback error">${errors.password}</div>
-                    <input type="password" class="form-control is-invalid input-style" placeholder="Nhập lại mật khẩu" required name="pwconfirm">
-                    <div class="invalid-feedback error">${errors.pwconfirm}</div>
 
-                    <button class="next w-100 mb-3 mt-3" type="submit">Đăng ký</button>
+                    <!-- Success Message -->
+                    <div id="successMessage" class="alert alert-success" style="display: none;"></div>
+
+                    <!-- General Error Message -->
+                    <div id="errorMessage" class="alert alert-danger" style="display: none;"></div>
+
+                    <!-- Last Name -->
+                    <div class="form-group mb-3">
+                        <label for="lastname" class="form-label">Họ và tên đệm *</label>
+                        <input type="text"
+                               id="lastname"
+                               class="form-control input-style"
+                               placeholder="Nhập họ và tên đệm của bạn"
+                               required
+                               name="lastname">
+                        <div class="invalid-feedback" id="lastnameError"></div>
+                    </div>
+
+                    <!-- First Name -->
+                    <div class="form-group mb-3">
+                        <label for="firstname" class="form-label">Tên *</label>
+                        <input type="text"
+                               id="firstname"
+                               class="form-control input-style"
+                               placeholder="Nhập tên của bạn"
+                               required
+                               name="firstname">
+                        <div class="invalid-feedback" id="firstnameError"></div>
+                    </div>
+
+                    <!-- Phone -->
+                    <div class="form-group mb-3">
+                        <label for="phone" class="form-label">Số điện thoại *</label>
+                        <input type="text"
+                               id="phone"
+                               class="form-control input-style"
+                               placeholder="Nhập số điện thoại (10 chữ số)"
+                               required
+                               name="phone"
+                               maxlength="10"
+                               pattern="[0-9]{10}">
+                        <div class="invalid-feedback" id="phoneError"></div>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="form-group mb-3">
+                        <label for="address" class="form-label">Địa chỉ *</label>
+                        <input type="text"
+                               id="address"
+                               class="form-control input-style"
+                               placeholder="Nhập địa chỉ của bạn"
+                               required
+                               name="address">
+                        <div class="invalid-feedback" id="addressError"></div>
+                    </div>
+
+                    <!-- Username -->
+                    <div class="form-group mb-3">
+                        <label for="usernameIn" class="form-label">Tên tài khoản *</label>
+                        <input type="text"
+                               id="usernameIn"
+                               class="form-control input-style"
+                               placeholder="Nhập tên tài khoản của bạn"
+                               required
+                               name="usernameIn">
+                        <div class="invalid-feedback" id="usernameError"></div>
+                    </div>
+
+                    <!-- Email -->
+                    <div class="form-group mb-3">
+                        <label for="email" class="form-label">Email *</label>
+                        <input type="email"
+                               id="email"
+                               class="form-control input-style"
+                               placeholder="Nhập địa chỉ email của bạn"
+                               required
+                               name="email">
+                        <div class="invalid-feedback" id="emailError"></div>
+                    </div>
+
+                    <!-- Password -->
+                    <div class="form-group mb-3">
+                        <label for="password" class="form-label">Mật khẩu *</label>
+                        <input type="password"
+                               id="password"
+                               class="form-control input-style"
+                               placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                               required
+                               name="password"
+                               minlength="6">
+                        <div class="invalid-feedback" id="passwordError"></div>
+                    </div>
+
+                    <!-- Password Confirmation -->
+                    <div class="form-group mb-3">
+                        <label for="pwconfirm" class="form-label">Xác nhận mật khẩu *</label>
+                        <input type="password"
+                               id="pwconfirm"
+                               class="form-control input-style"
+                               placeholder="Nhập lại mật khẩu để xác nhận"
+                               required
+                               name="pwconfirm">
+                        <div class="invalid-feedback" id="pwconfirmError"></div>
+                    </div>
+
+                    <button class="btn btn-success btn-register w-100 mb-3 mt-3" type="submit" id="registerBtn">
+                        <span id="registerBtnText">Đăng ký</span>
+                        <span id="registerSpinner" class="spinner-border spinner-border-sm" style="display: none;"></span>
+                    </button>
                     <span class="shortcut">Bạn đã có tài khoản? <a href="login">Đăng nhập</a></span>
                 </form>
 
@@ -59,5 +151,300 @@
 
 
 <div th:replace="~{fragments/my-fragments.html::footer}"/>
+
+<!-- JavaScript -->
+<script th:src="@{/js/jquery-3.2.1.min.js}"></script>
+<script th:src="@{/js/bootstrap.min.js}"></script>
+
+<script>
+$(document).ready(function() {
+    console.log('Register page JavaScript loaded');
+
+    // Handle register form submission
+    $('#registerForm').on('submit', function(e) {
+        e.preventDefault();
+        console.log('Register form submitted via AJAX');
+
+        // Clear previous errors
+        clearErrors();
+
+        // Get form data
+        const formData = {
+            lastname: $('#lastname').val().trim(),
+            firstname: $('#firstname').val().trim(),
+            phone: $('#phone').val().trim(),
+            address: $('#address').val().trim(),
+            usernameIn: $('#usernameIn').val().trim(),
+            email: $('#email').val().trim(),
+            password: $('#password').val(),
+            pwconfirm: $('#pwconfirm').val()
+        };
+
+        // Show loading state
+        showLoading(true);
+
+        // Submit via AJAX
+        console.log('Sending AJAX request to /api/register with data:', formData);
+        $.ajax({
+            url: '/api/register',
+            method: 'POST',
+            data: formData,
+            success: function(response) {
+                console.log('AJAX register success:', response);
+                showLoading(false);
+                if (response.success) {
+                    showSuccess(response.message);
+                    // Clear form
+                    $('#registerForm')[0].reset();
+                    // Redirect after delay
+                    setTimeout(function() {
+                        window.location.href = response.redirectUrl || '/login';
+                    }, 2000);
+                } else {
+                    showError(response.error || 'Đăng ký không thành công');
+                }
+            },
+            error: function(xhr) {
+                console.log('AJAX register error:', xhr);
+                showLoading(false);
+                const response = xhr.responseJSON;
+                if (response && response.errors) {
+                    displayFieldErrors(response.errors);
+                } else if (response && response.error) {
+                    showError(response.error);
+                } else {
+                    showError('Có lỗi xảy ra khi đăng ký. Vui lòng thử lại.');
+                }
+            }
+        });
+    });
+
+    // Real-time validation for all fields
+
+    // Last name validation
+    $('#lastname').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length === 0) {
+            showFieldError('lastname', 'Vui lòng nhập họ và tên đệm');
+        } else if (value.length < 2) {
+            showFieldError('lastname', 'Họ và tên đệm phải có ít nhất 2 ký tự');
+        } else {
+            clearFieldError('lastname');
+        }
+    });
+
+    // First name validation
+    $('#firstname').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length === 0) {
+            showFieldError('firstname', 'Vui lòng nhập tên');
+        } else if (value.length < 2) {
+            showFieldError('firstname', 'Tên phải có ít nhất 2 ký tự');
+        } else {
+            clearFieldError('firstname');
+        }
+    });
+
+    // Phone validation
+    $('#phone').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length === 0) {
+            showFieldError('phone', 'Vui lòng nhập số điện thoại');
+        } else if (!/^\d+$/.test(value)) {
+            showFieldError('phone', 'Số điện thoại chỉ được chứa chữ số');
+        } else if (value.length !== 10) {
+            showFieldError('phone', 'Số điện thoại phải có đúng 10 chữ số');
+        } else {
+            clearFieldError('phone');
+        }
+    });
+
+    // Address validation
+    $('#address').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length === 0) {
+            showFieldError('address', 'Vui lòng nhập địa chỉ');
+        } else if (value.length < 10) {
+            showFieldError('address', 'Địa chỉ phải có ít nhất 10 ký tự');
+        } else {
+            clearFieldError('address');
+        }
+    });
+
+    // Username validation
+    $('#usernameIn').on('input', function() {
+        const value = $(this).val().trim();
+        if (value.length === 0) {
+            showFieldError('usernameIn', 'Vui lòng nhập tên tài khoản');
+        } else if (value.length < 3) {
+            showFieldError('usernameIn', 'Tên tài khoản phải có ít nhất 3 ký tự');
+        } else if (!/^[a-zA-Z0-9_]+$/.test(value)) {
+            showFieldError('usernameIn', 'Tên tài khoản chỉ được chứa chữ, số và dấu gạch dưới');
+        } else {
+            clearFieldError('usernameIn');
+            // Check username availability (debounced)
+            checkUsernameAvailability(value);
+        }
+    });
+
+    // Email validation
+    $('#email').on('input', function() {
+        const value = $(this).val().trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+        if (value.length === 0) {
+            showFieldError('email', 'Vui lòng nhập email');
+        } else if (!emailRegex.test(value)) {
+            showFieldError('email', 'Email không hợp lệ');
+        } else {
+            clearFieldError('email');
+            // Check email availability (debounced)
+            checkEmailAvailability(value);
+        }
+    });
+
+    // Password validation
+    $('#password').on('input', function() {
+        const value = $(this).val();
+        if (value.length === 0) {
+            showFieldError('password', 'Vui lòng nhập mật khẩu');
+        } else if (value.length < 6) {
+            showFieldError('password', 'Mật khẩu phải có ít nhất 6 ký tự');
+        } else {
+            clearFieldError('password');
+        }
+
+        // Re-validate password confirmation if it has value
+        const confirmValue = $('#pwconfirm').val();
+        if (confirmValue) {
+            $('#pwconfirm').trigger('input');
+        }
+    });
+
+    // Password confirmation validation
+    $('#pwconfirm').on('input', function() {
+        const password = $('#password').val();
+        const confirm = $(this).val();
+
+        if (confirm.length === 0) {
+            showFieldError('pwconfirm', 'Vui lòng xác nhận mật khẩu');
+        } else if (password !== confirm) {
+            showFieldError('pwconfirm', 'Mật khẩu xác nhận không khớp');
+        } else {
+            clearFieldError('pwconfirm');
+        }
+    });
+});
+
+function showLoading(show) {
+    if (show) {
+        $('#registerBtnText').hide();
+        $('#registerSpinner').show();
+        $('#registerBtn').prop('disabled', true);
+    } else {
+        $('#registerBtnText').show();
+        $('#registerSpinner').hide();
+        $('#registerBtn').prop('disabled', false);
+    }
+}
+
+function showSuccess(message) {
+    $('#successMessage').text(message).show();
+    $('#errorMessage').hide();
+    // Scroll to top to show message
+    $('html, body').animate({scrollTop: 0}, 500);
+}
+
+function showError(message) {
+    $('#errorMessage').text(message).show();
+    $('#successMessage').hide();
+    // Scroll to top to show message
+    $('html, body').animate({scrollTop: 0}, 500);
+}
+
+function clearErrors() {
+    $('#successMessage, #errorMessage').hide();
+    $('.form-control').removeClass('is-invalid');
+    $('.invalid-feedback').hide().text('');
+}
+
+function clearFieldError(fieldId) {
+    $('#' + fieldId).removeClass('is-invalid');
+    $('#' + fieldId + 'Error').hide().text('');
+}
+
+function showFieldError(fieldId, message) {
+    $('#' + fieldId).addClass('is-invalid');
+    $('#' + fieldId + 'Error').text(message).show();
+}
+
+function displayFieldErrors(errors) {
+    for (const [field, message] of Object.entries(errors)) {
+        let fieldId = field;
+        // Handle username field mapping
+        if (field === 'username') {
+            fieldId = 'usernameIn';
+        }
+        $('#' + fieldId).addClass('is-invalid');
+        $('#' + fieldId + 'Error').text(message).show();
+    }
+
+    // Scroll to first error
+    const firstError = $('.is-invalid').first();
+    if (firstError.length) {
+        $('html, body').animate({
+            scrollTop: firstError.offset().top - 100
+        }, 500);
+    }
+}
+
+// Debounced functions for checking availability
+let usernameTimeout;
+let emailTimeout;
+
+function checkUsernameAvailability(username) {
+    clearTimeout(usernameTimeout);
+    usernameTimeout = setTimeout(function() {
+        if (username.length >= 3) {
+            $.ajax({
+                url: '/api/check-username',
+                method: 'POST',
+                data: { username: username },
+                success: function(response) {
+                    if (!response.available) {
+                        showFieldError('usernameIn', 'Tên tài khoản đã tồn tại');
+                    }
+                },
+                error: function() {
+                    // Silently fail for availability check
+                }
+            });
+        }
+    }, 500); // Wait 500ms after user stops typing
+}
+
+function checkEmailAvailability(email) {
+    clearTimeout(emailTimeout);
+    emailTimeout = setTimeout(function() {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (emailRegex.test(email)) {
+            $.ajax({
+                url: '/api/check-email',
+                method: 'POST',
+                data: { email: email },
+                success: function(response) {
+                    if (!response.available) {
+                        showFieldError('email', 'Email đã được sử dụng');
+                    }
+                },
+                error: function() {
+                    // Silently fail for availability check
+                }
+            });
+        }
+    }, 500); // Wait 500ms after user stops typing
+}
+</script>
+
 </body>
 </html>

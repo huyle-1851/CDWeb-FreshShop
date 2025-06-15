@@ -1,0 +1,405 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Quản lý danh mục - FreshShop Admin</title>
+    <meta name="keywords" content="">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <!-- Site Icons -->
+    <link rel="shortcut icon" href="/images/favicon.ico" type="image/x-icon">
+    <link rel="apple-touch-icon" href="/images/apple-touch-icon.png">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css">
+    <!-- Site CSS -->
+    <link rel="stylesheet" href="/css/style.css">
+    <!-- Responsive CSS -->
+    <link rel="stylesheet" href="/css/responsive.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/css/custom.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+</head>
+
+<body>
+    <!-- Start Main Top -->
+    <div th:replace="~{fragments/my-fragments.html::header('admin-categories')}"/>
+    <!-- End Main Top -->
+
+    <!-- Start All Title Box -->
+    <div class="all-title-box">
+        <div class="container">
+            <div class="row">
+                <div class="col-lg-12">
+                    <h2>Quản lý danh mục</h2>
+                    <ul class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Trang chủ</a></li>
+                        <li class="breadcrumb-item"><a href="/admin/dashboard">Admin</a></li>
+                        <li class="breadcrumb-item active">Quản lý danh mục</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End All Title Box -->
+
+    <!-- Start Category Management -->
+    <div class="category-management-box-main">
+        <div class="container">
+            <!-- Control Panel -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fa fa-cogs mr-2"></i>
+                                Bảng điều khiển danh mục
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <button class="btn btn-success btn-lg" onclick="showAddCategoryForm()">
+                                        <i class="fa fa-plus"></i> Thêm danh mục mới
+                                    </button>
+                                    <button class="btn btn-info btn-lg ml-2" onclick="loadCategories()">
+                                        <i class="fa fa-refresh"></i> Tải lại
+                                    </button>
+                                </div>
+                                <div class="col-md-6 text-right">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="searchInput" placeholder="Tìm kiếm danh mục...">
+                                        <div class="input-group-append">
+                                            <button class="btn btn-outline-secondary" onclick="searchCategories()">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Categories Table -->
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-header">
+                            <h5 class="mb-0">
+                                <i class="fa fa-list mr-2"></i>
+                                Danh sách danh mục
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div id="categories-container">
+                                <!-- Categories will be loaded here via AJAX -->
+                                <div class="text-center">
+                                    <div class="spinner-border" role="status">
+                                        <span class="sr-only">Đang tải...</span>
+                                    </div>
+                                    <p class="mt-2">Đang tải danh sách danh mục...</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Category Form Modal -->
+            <div class="modal fade" id="categoryModal" tabindex="-1" role="dialog">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="categoryModalTitle">Thêm danh mục mới</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <form id="categoryForm">
+                                <input type="hidden" id="categoryId" name="categoryId">
+                                
+                                <div class="form-group">
+                                    <label for="categoryName">Tên danh mục *</label>
+                                    <input type="text" class="form-control" id="categoryName" name="name" required>
+                                    <div class="invalid-feedback" id="nameError"></div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label for="categoryDescription">Mô tả danh mục</label>
+                                    <textarea class="form-control" id="categoryDescription" name="description" rows="3" disabled></textarea>
+                                    <small class="form-text text-muted">Tính năng mô tả sẽ được cập nhật trong phiên bản tương lai</small>
+                                </div>
+                            </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Hủy</button>
+                            <button type="button" class="btn btn-primary" onclick="saveCategory()">
+                                <i class="fa fa-save"></i> Lưu danh mục
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Category Management -->
+
+    <div th:replace="~{fragments/my-fragments.html::footer}"/>
+
+    <!-- ALL JS FILES -->
+    <script src="/js/jquery-3.2.1.min.js"></script>
+    <script src="/js/popper.min.js"></script>
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- ALL PLUGINS -->
+    <script src="/js/jquery.superslides.min.js"></script>
+    <script src="/js/bootstrap-select.js"></script>
+    <script src="/js/inewsticker.js"></script>
+    <script src="/js/bootsnav.js"></script>
+    <script src="/js/images-loded.min.js"></script>
+    <script src="/js/isotope.min.js"></script>
+    <script src="/js/owl.carousel.min.js"></script>
+    <script src="/js/baguetteBox.min.js"></script>
+    <script src="/js/form-validator.min.js"></script>
+    <script src="/js/contact-form-script.js"></script>
+    <script src="/js/custom.js"></script>
+
+    <!-- Category Management JavaScript -->
+    <script>
+        let currentCategories = [];
+        let isEditMode = false;
+
+        // Load categories on page load
+        $(document).ready(function() {
+            loadCategories();
+        });
+
+        // Load all categories
+        function loadCategories() {
+            $('#categories-container').html(`
+                <div class="text-center">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Đang tải...</span>
+                    </div>
+                    <p class="mt-2">Đang tải danh sách danh mục...</p>
+                </div>
+            `);
+
+            fetch('/admin/categories/list')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        currentCategories = data.categories;
+                        displayCategories(data.categories);
+                    } else {
+                        showError('Không thể tải danh sách danh mục: ' + (data.error || 'Lỗi không xác định'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Có lỗi xảy ra khi tải danh sách danh mục');
+                });
+        }
+
+        // Display categories in table
+        function displayCategories(categories) {
+            if (categories.length === 0) {
+                $('#categories-container').html(`
+                    <div class="alert alert-info text-center">
+                        <i class="fa fa-info-circle"></i>
+                        Chưa có danh mục nào. <a href="#" onclick="showAddCategoryForm()" class="alert-link">Thêm danh mục đầu tiên</a>
+                    </div>
+                `);
+                return;
+            }
+
+            let html = `
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th>ID</th>
+                                <th>Tên danh mục</th>
+                                <th>Mô tả</th>
+                                <th>Số sản phẩm</th>
+                                <th>Thao tác</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            categories.forEach(category => {
+                html += `
+                    <tr>
+                        <td>${category.id}</td>
+                        <td><strong>${category.name}</strong></td>
+                        <td><em class="text-muted">Không có mô tả</em></td>
+                        <td>
+                            <span class="badge badge-info">${category.productCount || 0} sản phẩm</span>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-info" onclick="editCategory(${category.id})" title="Chỉnh sửa">
+                                    <i class="fa fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteCategory(${category.id})" title="Xóa">
+                                    <i class="fa fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            $('#categories-container').html(html);
+        }
+
+        // Show add category form
+        function showAddCategoryForm() {
+            isEditMode = false;
+            $('#categoryModalTitle').text('Thêm danh mục mới');
+            $('#categoryForm')[0].reset();
+            $('#categoryId').val('');
+            clearErrors();
+            $('#categoryModal').modal('show');
+        }
+
+        // Edit category
+        function editCategory(id) {
+            isEditMode = true;
+            $('#categoryModalTitle').text('Chỉnh sửa danh mục');
+            
+            fetch(`/admin/categories/${id}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const category = data.category;
+                        $('#categoryId').val(category.id);
+                        $('#categoryName').val(category.name);
+                        $('#categoryDescription').val(''); // Description not supported yet
+                        
+                        clearErrors();
+                        $('#categoryModal').modal('show');
+                    } else {
+                        showError('Không thể tải thông tin danh mục: ' + (data.error || 'Lỗi không xác định'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    showError('Có lỗi xảy ra khi tải thông tin danh mục');
+                });
+        }
+
+        // Save category (add or update)
+        function saveCategory() {
+            const categoryId = $('#categoryId').val();
+            const formData = new FormData();
+            
+            formData.append('name', $('#categoryName').val());
+            formData.append('description', $('#categoryDescription').val());
+
+            const url = isEditMode ? `/admin/categories/${categoryId}/update` : '/admin/categories/add';
+            
+            fetch(url, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data.message);
+                    $('#categoryModal').modal('hide');
+                    loadCategories(); // Reload categories list
+                } else {
+                    if (data.error) {
+                        showError(data.error);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Có lỗi xảy ra khi lưu danh mục');
+            });
+        }
+
+        // Delete category
+        function deleteCategory(id) {
+            if (!confirm('Bạn có chắc chắn muốn xóa danh mục này? Hành động này không thể hoàn tác.')) {
+                return;
+            }
+
+            fetch(`/admin/categories/${id}`, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data.message);
+                    loadCategories(); // Reload categories list
+                } else {
+                    showError(data.error || 'Có lỗi xảy ra khi xóa danh mục');
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showError('Có lỗi xảy ra khi xóa danh mục');
+            });
+        }
+
+        // Search categories
+        function searchCategories() {
+            const searchTerm = $('#searchInput').val().toLowerCase();
+            if (!searchTerm) {
+                displayCategories(currentCategories);
+                return;
+            }
+
+            const filteredCategories = currentCategories.filter(category =>
+                category.name.toLowerCase().includes(searchTerm)
+            );
+
+            displayCategories(filteredCategories);
+        }
+
+        // Utility functions
+        function showSuccess(message) {
+            alert('Thành công: ' + message);
+        }
+
+        function showError(message) {
+            $('#categories-container').html(`
+                <div class="alert alert-danger">
+                    <i class="fa fa-exclamation-triangle"></i> ${message}
+                </div>
+            `);
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.invalid-feedback').forEach(element => {
+                element.textContent = '';
+                element.style.display = 'none';
+            });
+        }
+
+        // Search on Enter key
+        $('#searchInput').keypress(function(e) {
+            if (e.which === 13) {
+                searchCategories();
+            }
+        });
+    </script>
+</body>
+</html>

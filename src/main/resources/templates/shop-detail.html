@@ -47,25 +47,41 @@
             <div class="col-xl-5 col-lg-5 col-md-6">
                 <div id="carousel-example-1" class="single-product-slider carousel slide" data-ride="carousel">
                     <div class="carousel-inner" role="listbox">
-                        <th:block th:each="img, state:${product.getImages()}">
-                            <div class="carousel-item" th:classappend="${state.index == 0} ? active : ''">
-                                <img class="d-block w-100" th:src="${img.getUrl()}"
-                                     alt="Image"></div>
+                        <!-- Show product images if available -->
+                        <th:block th:if="${product.images != null and !product.images.empty}">
+                            <th:block th:each="img, state : ${product.images}">
+                                <div class="carousel-item" th:classappend="${state.index == 0} ? 'active' : ''">
+                                    <img class="d-block w-100" th:src="${img.url}" th:alt="${product.name}"
+                                         style="height: 400px; object-fit: cover;">
+                                </div>
+                            </th:block>
+                        </th:block>
+                        <!-- Show default image if no images available -->
+                        <th:block th:if="${product.images == null or product.images.empty}">
+                            <div class="carousel-item active">
+                                <img class="d-block w-100" th:src="@{/images/no-image.jpg}" alt="No Image Available"
+                                     style="height: 400px; object-fit: cover;">
+                            </div>
                         </th:block>
                     </div>
-                    <a class="carousel-control-prev" href="#carousel-example-1" role="button" data-slide="prev">
-                        <i class="fa fa-angle-left" aria-hidden="true"></i>
-                        <span class="sr-only">Previous</span>
-                    </a>
-                    <a class="carousel-control-next" href="#carousel-example-1" role="button" data-slide="next">
-                        <i class="fa fa-angle-right" aria-hidden="true"></i>
-                        <span class="sr-only">Next</span>
-                    </a>
-                    <ol class="carousel-indicators">
-                        <th:block th:each="url, state:${product.getImages()}">
-                            <li data-target="#carousel-example-1" data-slide-to="${state.index}"
-                                th:class="${state.index == 0} ? active : ''">
-                                <img class="d-block w-100 img-fluid" src="${url}" alt=""/>
+                    <!-- Show navigation only if there are multiple images -->
+                    <th:block th:if="${product.images != null and product.images.size() > 1}">
+                        <a class="carousel-control-prev" href="#carousel-example-1" role="button" data-slide="prev">
+                            <i class="fa fa-angle-left" aria-hidden="true"></i>
+                            <span class="sr-only">Previous</span>
+                        </a>
+                        <a class="carousel-control-next" href="#carousel-example-1" role="button" data-slide="next">
+                            <i class="fa fa-angle-right" aria-hidden="true"></i>
+                            <span class="sr-only">Next</span>
+                        </a>
+                    </th:block>
+                    <ol class="carousel-indicators" th:if="${product.images != null and !product.images.empty and product.images.size() > 1}">
+                        <th:block th:each="img, state : ${product.images}">
+                            <li data-target="#carousel-example-1"
+                                th:data-slide-to="${state.index}"
+                                th:class="${state.index == 0} ? 'active' : ''">
+                                <img class="d-block w-100 img-fluid" th:src="${img.url}" th:alt="${product.name}"
+                                     style="height: 60px; object-fit: cover;"/>
                             </li>
                         </th:block>
                     </ol>
@@ -74,51 +90,44 @@
             <div class="col-xl-7 col-lg-7 col-md-6">
                 <div class="single-product-details">
                     <h2 th:text="${product.getName()}"></h2>
-                    <h5 th:with="check=${product.getDiscountedPrice()==0||product.getDiscountedPrice()==product.getPrice()}">
-                        <th:block th:if="${check}">
-                            <div><span th:text="${product.getPrice()}"></span>đ</div>
-                            <div th:with="price=${product.getPrice()}"/>
+                    <h5 th:with="hasDiscount=${product.discountedPrice != null and product.discountedPrice > 0 and product.discountedPrice != product.price},
+                                 finalPrice=${hasDiscount ? product.discountedPrice : product.price}">
+                        <th:block th:if="${hasDiscount}">
+                            <del th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + 'đ'"></del>
+                            <span class="text-danger font-weight-bold" th:text="${#numbers.formatInteger(product.discountedPrice, 0, 'COMMA')} + 'đ'"></span>
                         </th:block>
-                        <th:block th:unless="${check}">
-                            <del th:text="${product.getPrice()} + đ"></del>
-                            <div><span th:text="${product.getDiscountedPrice()}"></span>đ</div>
-                            <div th:with="price=${product.getDiscountedPrice()}"/>
+                        <th:block th:unless="${hasDiscount}">
+                            <span class="font-weight-bold" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + 'đ'"></span>
                         </th:block>
                     </h5>
-                    <p class="available-stock">
-                        <span th:text="${product.quantity} + ' có sẵn'"></span> / <a href="#">8 đã bán</a>
-                    </p>
-
                     <h4>Mô tả:</h4>
-                    <p th:text="${product.getDescription()}"></p>
-                    <ul>
-                        <li>
-                            <div class="form-group quantity-box">
-                                <label class="control-label">Số lượng</label>
-                                <input class="form-control" value="1" min="1" max="${product.getQuantity()}"
-                                       type="number">
-                            </div>
-                        </li>
-                    </ul>
-                    <div th:with="var=0"/>
-                    <th:block th:each="item, state: ${cart}">
-                        <th:block th:if="${item.getProduct().getId() == product.getId()}">
-                            <div th:with="indexItem=${state.index}" var="" value=""/>
-                        </th:block>
-                    </th:block>
+                    <p th:text="${product.description != null ? product.description : 'Chưa có mô tả'}"></p>
+
+                    <div class="form-group quantity-box" style="max-width: 150px;">
+                        <label class="control-label" style="font-weight: 600; margin-bottom: 8px;">Số lượng</label>
+                        <div class="quantity-input-wrapper" style="display: flex; align-items: center; border: 1px solid #ddd; border-radius: 4px; overflow: hidden;">
+                            <button type="button" class="quantity-btn" onclick="decreaseQuantity()"
+                                    style="background: #f8f9fa; border: none; padding: 8px 12px; cursor: pointer; font-size: 16px; font-weight: bold;">-</button>
+                            <input id="quantity-input" class="form-control" value="1" min="1"
+                                   th:max="${product.quantity != null ? product.quantity : 1}" type="number"
+                                   style="border: none; text-align: center; width: 60px; padding: 8px 4px; font-weight: 600;"
+                                   onchange="validateQuantity()">
+                            <button type="button" class="quantity-btn" onclick="increaseQuantity()"
+                                    style="background: #f8f9fa; border: none; padding: 8px 12px; cursor: pointer; font-size: 16px; font-weight: bold;">+</button>
+                        </div>
+                    </div>
+
                     <div class="price-box-bar">
                         <div class="cart-and-bay-btn">
-                            <a class="btn hvr-hover" data-fancybox-close="" th:href="@{/cart}"
-                               th:onclick="addItem(/*[[${product.id}]]*/, /*[[${price}]]*/, /*[[${cart.size()}]]*/'', /*[[${indexItem}]]*/, true)">Mua
-                                ngay</a>
+                            <button class="btn hvr-hover" onclick="buyNow()"
+                                    th:data-product-id="${product.id}">
+                                Mua ngay
+                            </button>
 
-                            <a class="btn hvr-hover" data-fancybox-close="" style="color: white"
-                               th:onclick="addItem(/*[[${product.id}]]*/, /*[[${price}]]*/, /*[[${cart.size()}]]*/'', /*[[${indexItem}]]*/, true)"></a>
-
-                            <th:block th:if="${username!=null}">alert('Đã thêm sản phẩm')</th:block>
-                            <th:block th:if="${username==null}">window.location.href = 'cart'</th:block>
-                            ">
-                            Thêm vào giỏ hàng</a>
+                            <button class="btn hvr-hover" style="color: white" onclick="addToCart()"
+                                    th:data-product-id="${product.id}">
+                                Thêm vào giỏ hàng
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -369,5 +378,161 @@
 <!-- End Cart -->
 
 <div th:replace="~{fragments/my-fragments.html::footer}"/>
+<div th:replace="~{fragments/my-fragments.html::script}"/>
+
+<script>
+function addToCart() {
+    const productId = document.querySelector('[data-product-id]').getAttribute('data-product-id');
+    const quantity = document.getElementById('quantity-input').value;
+
+    $.ajax({
+        url: '/add-item',
+        type: 'POST',
+        data: {
+            idP: productId,
+            quan: quantity,
+            cumulative: true
+        },
+        success: function(response) {
+            alert('Đã thêm sản phẩm vào giỏ hàng!');
+            // Update cart count in header
+            updateCartCount();
+        },
+        error: function(xhr, status, error) {
+            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+        }
+    });
+}
+
+function buyNow() {
+    const productId = document.querySelector('[data-product-id]').getAttribute('data-product-id');
+    const quantity = document.getElementById('quantity-input').value;
+
+    $.ajax({
+        url: '/add-item',
+        type: 'POST',
+        data: {
+            idP: productId,
+            quan: quantity,
+            cumulative: true
+        },
+        success: function(response) {
+            window.location.href = '/cart';
+        },
+        error: function(xhr, status, error) {
+            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+        }
+    });
+}
+
+function updateCartCount() {
+    $.get('/cart-count', function(data) {
+        if (data.success) {
+            $('.cart-box .cart-count').text(data.count);
+        }
+    });
+}
+
+// Quantity control functions
+function increaseQuantity() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value) || 1;
+    const maxValue = parseInt(input.max) || 999;
+
+    if (currentValue < maxValue) {
+        input.value = currentValue + 1;
+    }
+}
+
+function decreaseQuantity() {
+    const input = document.getElementById('quantity-input');
+    const currentValue = parseInt(input.value) || 1;
+    const minValue = parseInt(input.min) || 1;
+
+    if (currentValue > minValue) {
+        input.value = currentValue - 1;
+    }
+}
+
+function validateQuantity() {
+    const input = document.getElementById('quantity-input');
+    const value = parseInt(input.value) || 1;
+    const minValue = parseInt(input.min) || 1;
+    const maxValue = parseInt(input.max) || 999;
+
+    if (value < minValue) {
+        input.value = minValue;
+    } else if (value > maxValue) {
+        input.value = maxValue;
+        alert(`Số lượng tối đa là ${maxValue}`);
+    }
+}
+</script>
+
+<style>
+/* Quantity control styling */
+.quantity-box {
+    margin-bottom: 20px;
+}
+
+.quantity-input-wrapper {
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: box-shadow 0.2s ease;
+}
+
+.quantity-input-wrapper:hover {
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.quantity-btn {
+    transition: background-color 0.2s ease, color 0.2s ease;
+    user-select: none;
+}
+
+.quantity-btn:hover {
+    background-color: #b0b435 !important;
+    color: white !important;
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+#quantity-input {
+    outline: none;
+    box-shadow: none;
+}
+
+#quantity-input:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+/* Remove number input arrows */
+#quantity-input::-webkit-outer-spin-button,
+#quantity-input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+#quantity-input[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Button styling improvements */
+.cart-and-bay-btn .btn {
+    padding: 12px 24px;
+    font-weight: 600;
+    border-radius: 4px;
+    margin-right: 10px;
+    transition: all 0.3s ease;
+}
+
+.cart-and-bay-btn .btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+</style>
+
 </body>
 </html>

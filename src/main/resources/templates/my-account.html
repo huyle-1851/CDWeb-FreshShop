@@ -43,13 +43,44 @@
 <!-- Start My Account  -->
 <div class="my-account-box-main">
     <div class="container">
+        <!-- User Information Section -->
+        <div class="row mb-4" th:if="${currentUser}">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h4 class="mb-0">
+                            <i class="fa fa-user mr-2"></i>
+                            Thông tin tài khoản
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <p><strong>Tên đăng nhập:</strong> <span th:text="${currentUser.username}">username</span></p>
+                                <p><strong>Họ và tên:</strong> <span th:text="${currentUser.firstname + ' ' + currentUser.lastname}">Full Name</span></p>
+                                <p><strong>Email:</strong> <span th:text="${currentUser.email}">email@example.com</span></p>
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Số điện thoại:</strong> <span th:text="${currentUser.phone}">0123456789</span></p>
+                                <p><strong>Địa chỉ:</strong> <span th:text="${currentUser.address}">Address</span></p>
+                                <p><strong>Vai trò:</strong>
+                                    <span th:if="${isAdmin}" class="badge badge-success">Quản trị viên</span>
+                                    <span th:unless="${isAdmin}" class="badge badge-primary">Người dùng</span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="my-account-page">
             <div class="row">
-                <div class="col-lg-4 col-md-12">
+                <div class="col-lg-6 col-md-12">
                     <div class="account-box">
                         <div class="service-box">
                             <div class="service-icon">
-                                <a href="#"> <i class="fa fa-gift"></i> </a>
+                                <a href="#" onclick="loadOrders(); return false;"> <i class="fa fa-gift"></i> </a>
                             </div>
                             <div class="service-desc">
                                 <h4>Các đơn của bạn</h4>
@@ -58,11 +89,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
+                <div class="col-lg-6 col-md-12">
                     <div class="account-box">
                         <div class="service-box">
                             <div class="service-icon">
-                                <a href="#"><i class="fa fa-lock"></i> </a>
+                                <a href="#" onclick="loadProfileSettings(); return false;"><i class="fa fa-lock"></i> </a>
                             </div>
                             <div class="service-desc">
                                 <h4>Đăng nhập & bảo mật</h4>
@@ -71,11 +102,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
+                <div class="col-lg-6 col-md-12">
                     <div class="account-box">
                         <div class="service-box">
                             <div class="service-icon">
-                                <a href="#"> <i class="fa fa-location-arrow"></i> </a>
+                                <a href="#" onclick="loadAddressSettings(); return false;"> <i class="fa fa-location-arrow"></i> </a>
                             </div>
                             <div class="service-desc">
                                 <h4>Địa chỉ</h4>
@@ -84,11 +115,11 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
+                <div class="col-lg-6 col-md-12">
                     <div class="account-box">
                         <div class="service-box">
                             <div class="service-icon">
-                                <a href="#"> <i class="fa fa-credit-card"></i> </a>
+                                <a href="#" onclick="loadPaymentSettings(); return false;"> <i class="fa fa-credit-card"></i> </a>
                             </div>
                             <div class="service-desc">
                                 <h4>Phương thức thanh toán</h4>
@@ -97,126 +128,761 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="account-box">
-                        <div class="service-box">
-                            <div class="service-icon">
-                                <a href="#"> <i class="fab fa-paypal"></i> </a>
-                            </div>
-                            <div class="service-desc">
-                                <h4>PayPal</h4>
-                                <p>Xem các lợi ích và cài đặt thanh toán</p>
-                            </div>
-                        </div>
+
+            </div>
+        </div>
+
+        <!-- Dynamic Content Area -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <div id="dynamic-content" class="card" style="display: none;">
+                    <div class="card-header">
+                        <h5 id="content-title" class="mb-0"></h5>
+                        <button type="button" class="btn btn-sm btn-secondary float-right" onclick="closeDynamicContent()">
+                            <i class="fa fa-times"></i> Đóng
+                        </button>
                     </div>
-                </div>
-                <div class="col-lg-4 col-md-12">
-                    <div class="account-box">
-                        <div class="service-box">
-                            <div class="service-icon">
-                                <a href="#"> <i class="fab fa-amazon"></i> </a>
-                            </div>
-                            <div class="service-desc">
-                                <h4>Số dư trên Amazon Pay</h4>
-                                <p>Thêm tiền vào số dư của bạn</p>
-                            </div>
-                        </div>
+                    <div class="card-body" id="content-body">
+                        <!-- Dynamic content will be loaded here -->
                     </div>
                 </div>
             </div>
-            <!--                <div class="bottom-box">-->
-            <!--                    <div class="row">-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>Đồ trang sức bằng vàng và kim cương</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Ứng dụng và hơn thế nữa</a> </li>-->
-            <!--                                            <li> <a href="#">Nội dung và thiết bị</a> </li>-->
-            <!--                                            <li> <a href="#">Cài đặt âm nhạc</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>Cửa hàng thủ công mỹ nghệ & hàng thủ công</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Tùy chọn quảng cáo</a> </li>-->
-            <!--                                            <li> <a href="#">Sở thích giao tiếp</a> </li>-->
-            <!--                                            <li> <a href="#">Tùy chọn cảnh báo SMS</a> </li>-->
-            <!--                                            <li> <a href="#">Trung tâm tin nhắn</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>The Designer Boutique</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Amazon Pay</a> </li>-->
-            <!--                                            <li> <a href="#">Bank accounts for refunds</a> </li>-->
-            <!--                                            <li> <a href="#">Coupons</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>Gift Boxes, Gift Tags, Greeting Cards</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Leave delivery feedback</a> </li>-->
-            <!--                                            <li> <a href="#">Lists</a> </li>-->
-            <!--                                            <li> <a href="#">Photo ID proofs</a> </li>-->
-            <!--                                            <li> <a href="#">Profile</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>Other accounts</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Amazon Business registration</a> </li>-->
-            <!--                                            <li> <a href="#">Seller account</a> </li>-->
-            <!--                                            <li> <a href="#">Amazon Web Services</a> </li>-->
-            <!--                                            <li> <a href="#">Login with Amazon</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                        <div class="col-lg-4 col-md-12">-->
-            <!--                            <div class="account-box">-->
-            <!--                                <div class="service-box">-->
-            <!--                                    <div class="service-desc">-->
-            <!--                                        <h4>Shopping programs and rentals</h4>-->
-            <!--                                        <ul>-->
-            <!--                                            <li> <a href="#">Subscribe &amp; Save</a> </li>-->
-            <!--                                        </ul>-->
-            <!--                                    </div>-->
-            <!--                                </div>-->
-            <!--                            </div>-->
-            <!--                        </div>-->
-            <!--                    </div>-->
-            <!--                </div>-->
         </div>
     </div>
 </div>
 <!-- End My Account -->
+
+<!-- JavaScript for AJAX functionality -->
+<script>
+// Load user orders
+function loadOrders() {
+    showLoading('Đang tải đơn hàng...');
+
+    fetch('/account/orders')
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayOrders(data);
+            } else {
+                showError(data.error || 'Có lỗi xảy ra khi tải đơn hàng');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Có lỗi xảy ra khi tải đơn hàng');
+        });
+}
+
+// Display orders
+function displayOrders(data) {
+    const title = `Các đơn hàng của bạn`;
+    let content = `
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="alert alert-info">
+                    <strong>Tổng số đơn hàng:</strong> ${data.orderCount}
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="alert alert-success">
+                    <strong>Tổng chi tiêu:</strong> ${formatCurrency(data.totalSpent)}
+                </div>
+            </div>
+            <div class="col-md-4">
+
+
+
+            </div>
+        </div>
+    `;
+
+    if (data.message) {
+        content += `<div class="alert alert-info"><i class="fa fa-info-circle"></i> ${data.message}</div>`;
+    }
+
+    if (data.orders.length === 0) {
+        content += `
+            <div class="alert alert-warning">
+                <i class="fa fa-shopping-cart"></i> Bạn chưa có đơn hàng nào.
+                <br><br>
+                <a href="/shop" class="btn btn-primary">
+                    <i class="fa fa-shopping-bag"></i> Mua sắm ngay
+                </a>
+            </div>
+        `;
+    } else {
+        content += '<div class="table-responsive"><table class="table table-striped">';
+        content += `
+            <thead>
+                <tr>
+                    <th>Mã đơn</th>
+                    <th>Ngày đặt</th>
+                    <th>Trạng thái</th>
+                    <th>Thanh toán</th>
+                    <th>Tổng tiền</th>
+                    <th>Thao tác</th>
+                </tr>
+            </thead>
+            <tbody>
+        `;
+
+        data.orders.forEach(order => {
+            const orderDate = new Date(order.orderDate).toLocaleDateString('vi-VN');
+            const canCancel = order.status === 'PENDING' || order.status === 'CONFIRMED';
+
+            content += `
+                <tr>
+                    <td>#${order.id}</td>
+                    <td>${orderDate}</td>
+                    <td><span class="badge badge-${getStatusColor(order.status)}">${getStatusText(order.status)}</span></td>
+                    <td><span class="badge badge-${getPaymentStatusColor(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span></td>
+                    <td>${formatCurrency(order.totalAmount)}</td>
+                    <td>
+                        <button class="btn btn-sm btn-info" onclick="viewOrderDetails(${order.id})">
+                            <i class="fa fa-eye"></i> Xem
+                        </button>
+                        ${canCancel ? `<button class="btn btn-sm btn-danger ml-1" onclick="cancelOrder(${order.id})">
+                            <i class="fa fa-times"></i> Hủy
+                        </button>` : ''}
+                    </td>
+                </tr>
+            `;
+        });
+
+        content += '</tbody></table></div>';
+    }
+
+    showDynamicContent(title, content);
+}
+
+// Load profile settings
+function loadProfileSettings() {
+    const title = 'Cài đặt tài khoản & bảo mật';
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <h6>Thông tin cá nhân</h6>
+                <form id="profile-form">
+                    <div class="form-group">
+                        <label>Tên</label>
+                        <input type="text" class="form-control" id="firstname" value="${currentUser.firstname}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Họ</label>
+                        <input type="text" class="form-control" id="lastname" value="${currentUser.lastname}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Số điện thoại</label>
+                        <input type="text" class="form-control" id="phone" value="${currentUser.phone}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="email" class="form-control" id="email" value="${currentUser.email}" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Địa chỉ</label>
+                        <textarea class="form-control" id="address" rows="3">${currentUser.address || ''}</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-save"></i> Cập nhật thông tin
+                    </button>
+                </form>
+            </div>
+            <div class="col-md-6">
+                <h6>Đổi mật khẩu</h6>
+                <form id="password-form">
+                    <div class="form-group">
+                        <label>Mật khẩu hiện tại</label>
+                        <input type="password" class="form-control" id="currentPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Mật khẩu mới</label>
+                        <input type="password" class="form-control" id="newPassword" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Xác nhận mật khẩu mới</label>
+                        <input type="password" class="form-control" id="confirmPassword" required>
+                    </div>
+                    <button type="submit" class="btn btn-warning">
+                        <i class="fa fa-key"></i> Đổi mật khẩu
+                    </button>
+                </form>
+            </div>
+        </div>
+    `;
+
+    showDynamicContent(title, content);
+
+    // Add form event listeners
+    document.getElementById('profile-form').addEventListener('submit', updateProfile);
+    document.getElementById('password-form').addEventListener('submit', changePassword);
+}
+
+// Load address settings
+function loadAddressSettings() {
+    const title = 'Quản lý địa chỉ';
+    const content = `
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fa fa-home"></i> Địa chỉ chính</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Địa chỉ:</strong></p>
+                        <p class="text-muted">${currentUser.address || 'Chưa có địa chỉ chính'}</p>
+                        <button class="btn btn-primary btn-sm" onclick="editMainAddress()">
+                            <i class="fa fa-edit"></i> Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0"><i class="fa fa-truck"></i> Địa chỉ giao hàng</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Địa chỉ giao hàng đã lưu:</strong></p>
+                        <p class="text-muted">${currentUser.deliveryAddress || 'Chưa có địa chỉ giao hàng riêng'}</p>
+                        <button class="btn btn-success btn-sm" onclick="editDeliveryAddress()">
+                            <i class="fa fa-edit"></i> Chỉnh sửa
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-3">
+            <div class="col-12">
+                <div class="alert alert-info">
+                    <i class="fa fa-info-circle"></i>
+                    <strong>Lưu ý:</strong> Địa chỉ chính sẽ được sử dụng làm mặc định cho tất cả đơn hàng.
+                    Địa chỉ giao hàng riêng sẽ được hiển thị như một tùy chọn khi đặt hàng.
+                </div>
+            </div>
+        </div>
+
+        <!-- Address Edit Forms (hidden by default) -->
+        <div id="mainAddressForm" style="display: none;" class="mt-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Chỉnh sửa địa chỉ chính</h6>
+                </div>
+                <div class="card-body">
+                    <form id="main-address-form">
+                        <div class="form-group">
+                            <label>Địa chỉ chính *</label>
+                            <textarea class="form-control" id="mainAddressInput" rows="3" required>${currentUser.address || ''}</textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fa fa-save"></i> Lưu địa chỉ chính
+                        </button>
+                        <button type="button" class="btn btn-secondary ml-2" onclick="cancelAddressEdit()">
+                            <i class="fa fa-times"></i> Hủy
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div id="deliveryAddressForm" style="display: none;" class="mt-3">
+            <div class="card">
+                <div class="card-header">
+                    <h6 class="mb-0">Chỉnh sửa địa chỉ giao hàng</h6>
+                </div>
+                <div class="card-body">
+                    <form id="delivery-address-form">
+                        <div class="form-group">
+                            <label>Địa chỉ giao hàng</label>
+                            <textarea class="form-control" id="deliveryAddressInput" rows="3">${currentUser.deliveryAddress || ''}</textarea>
+                            <small class="form-text text-muted">Để trống nếu muốn sử dụng địa chỉ chính làm địa chỉ giao hàng</small>
+                        </div>
+                        <button type="submit" class="btn btn-success">
+                            <i class="fa fa-save"></i> Lưu địa chỉ giao hàng
+                        </button>
+                        <button type="button" class="btn btn-secondary ml-2" onclick="cancelAddressEdit()">
+                            <i class="fa fa-times"></i> Hủy
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    `;
+
+    showDynamicContent(title, content);
+
+    // Add form event listeners
+    setTimeout(() => {
+        const mainForm = document.getElementById('main-address-form');
+        const deliveryForm = document.getElementById('delivery-address-form');
+
+        if (mainForm) {
+            mainForm.addEventListener('submit', updateMainAddress);
+        }
+        if (deliveryForm) {
+            deliveryForm.addEventListener('submit', updateDeliveryAddress);
+        }
+    }, 100);
+}
+
+// Load payment settings
+function loadPaymentSettings() {
+    const title = 'Phương thức thanh toán';
+    const content = `
+        <div class="alert alert-info">
+            <i class="fa fa-info-circle"></i>
+            Hiện tại chúng tôi chỉ hỗ trợ thanh toán khi nhận hàng (COD)
+        </div>
+        <div class="card">
+            <div class="card-body">
+                <h6>Phương thức thanh toán khả dụng</h6>
+                <div class="list-group">
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <div>
+                            <i class="fa fa-money-bill text-success"></i>
+                            <strong>Thanh toán khi nhận hàng (COD)</strong>
+                            <br>
+                            <small class="text-muted">Thanh toán bằng tiền mặt khi nhận hàng</small>
+                        </div>
+                        <span class="badge badge-success">Đang sử dụng</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+
+    showDynamicContent(title, content);
+}
+
+// Utility functions
+function showDynamicContent(title, content) {
+    document.getElementById('content-title').textContent = title;
+    document.getElementById('content-body').innerHTML = content;
+    document.getElementById('dynamic-content').style.display = 'block';
+    document.getElementById('dynamic-content').scrollIntoView({ behavior: 'smooth' });
+}
+
+function closeDynamicContent() {
+    document.getElementById('dynamic-content').style.display = 'none';
+}
+
+function showLoading(message) {
+    showDynamicContent('Đang tải...', `
+        <div class="text-center">
+            <div class="spinner-border" role="status">
+                <span class="sr-only">Loading...</span>
+            </div>
+            <p class="mt-2">${message}</p>
+        </div>
+    `);
+}
+
+function showError(message) {
+    showDynamicContent('Lỗi', `
+        <div class="alert alert-danger">
+            <i class="fa fa-exclamation-triangle"></i> ${message}
+        </div>
+    `);
+}
+
+function formatCurrency(amount) {
+    return new Intl.NumberFormat('vi-VN', {
+        style: 'currency',
+        currency: 'VND'
+    }).format(amount);
+}
+
+function getStatusColor(status) {
+    const colors = {
+        'PENDING': 'warning',
+        'CONFIRMED': 'info',
+        'PREPARING': 'primary',
+        'SHIPPING': 'secondary',
+        'DELIVERED': 'success',
+        'CANCELLED': 'danger',
+        'RETURNED': 'dark'
+    };
+    return colors[status] || 'secondary';
+}
+
+function getStatusText(status) {
+    const texts = {
+        'PENDING': 'Chờ xử lý',
+        'CONFIRMED': 'Đã xác nhận',
+        'PREPARING': 'Đang chuẩn bị',
+        'SHIPPING': 'Đang giao hàng',
+        'DELIVERED': 'Đã giao hàng',
+        'CANCELLED': 'Đã hủy',
+        'RETURNED': 'Đã trả hàng'
+    };
+    return texts[status] || status;
+}
+
+function getPaymentStatusText(status) {
+    const texts = {
+        'PENDING': 'Chờ thanh toán',
+        'PAID': 'Đã thanh toán',
+        'FAILED': 'Thanh toán thất bại'
+    };
+    return texts[status] || status;
+}
+
+function getPaymentStatusColor(status) {
+    const colors = {
+        'PENDING': 'warning',
+        'PAID': 'success',
+        'FAILED': 'danger'
+    };
+    return colors[status] || 'secondary';
+}
+
+// Update profile function
+function updateProfile(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append('firstname', document.getElementById('firstname').value);
+    formData.append('lastname', document.getElementById('lastname').value);
+    formData.append('phone', document.getElementById('phone').value);
+    formData.append('email', document.getElementById('email').value);
+    formData.append('address', document.getElementById('address').value);
+
+    fetch('/account/profile/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            // Update current user data
+            currentUser.firstname = data.user.firstname;
+            currentUser.lastname = data.user.lastname;
+            currentUser.phone = data.user.phone;
+            currentUser.email = data.user.email;
+            currentUser.address = data.user.address;
+            // Refresh user info display
+            location.reload();
+        } else {
+            if (data.errors) {
+                let errorMsg = 'Vui lòng kiểm tra lại:\n';
+                Object.values(data.errors).forEach(error => {
+                    errorMsg += '- ' + error + '\n';
+                });
+                showAlert('danger', errorMsg);
+            } else {
+                showAlert('danger', data.error || 'Có lỗi xảy ra');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Có lỗi xảy ra khi cập nhật thông tin');
+    });
+}
+
+// Change password function
+function changePassword(event) {
+    event.preventDefault();
+
+    const formData = new FormData();
+    formData.append('currentPassword', document.getElementById('currentPassword').value);
+    formData.append('newPassword', document.getElementById('newPassword').value);
+    formData.append('confirmPassword', document.getElementById('confirmPassword').value);
+
+    fetch('/account/password/change', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', data.message);
+            // Clear form
+            document.getElementById('password-form').reset();
+        } else {
+            if (data.errors) {
+                let errorMsg = 'Vui lòng kiểm tra lại:\n';
+                Object.values(data.errors).forEach(error => {
+                    errorMsg += '- ' + error + '\n';
+                });
+                showAlert('danger', errorMsg);
+            } else {
+                showAlert('danger', data.error || 'Có lỗi xảy ra');
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Có lỗi xảy ra khi đổi mật khẩu');
+    });
+}
+
+// View order details
+function viewOrderDetails(orderId) {
+    showLoading('Đang tải chi tiết đơn hàng...');
+
+    fetch(`/account/orders/${orderId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                displayOrderDetails(data.order);
+            } else {
+                showError(data.error || 'Có lỗi xảy ra khi tải chi tiết đơn hàng');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showError('Có lỗi xảy ra khi tải chi tiết đơn hàng');
+        });
+}
+
+// Display order details
+function displayOrderDetails(order) {
+    const title = `Chi tiết đơn hàng #${order.id}`;
+    const orderDate = new Date(order.orderDate).toLocaleDateString('vi-VN');
+
+    let content = `
+        <div class="row mb-3">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Thông tin đơn hàng</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Mã đơn:</strong> #${order.id}</p>
+                        <p><strong>Ngày đặt:</strong> ${orderDate}</p>
+                        <p><strong>Trạng thái:</strong> <span class="badge badge-${getStatusColor(order.status)}">${getStatusText(order.status)}</span></p>
+                        <p><strong>Thanh toán:</strong> <span class="badge badge-${getPaymentStatusColor(order.paymentStatus)}">${getPaymentStatusText(order.paymentStatus)}</span></p>
+                        <p><strong>Tổng tiền:</strong> ${formatCurrency(order.totalAmount)}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h6 class="mb-0">Thông tin giao hàng</h6>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Địa chỉ:</strong> ${order.deliveryAddress || 'Không có'}</p>
+                        <p><strong>Số điện thoại:</strong> ${order.phone || 'Không có'}</p>
+                        <p><strong>Ghi chú:</strong> ${order.notes || 'Không có'}</p>
+                        <p><strong>Phương thức thanh toán:</strong> ${order.paymentMethod || 'COD'}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h6 class="mb-0">Sản phẩm đã đặt</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-sm">
+                        <thead>
+                            <tr>
+                                <th>Sản phẩm</th>
+                                <th>Số lượng</th>
+                                <th>Đơn giá</th>
+                                <th>Thành tiền</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+    `;
+
+    if (order.orderItems && order.orderItems.length > 0) {
+        order.orderItems.forEach(item => {
+            const subtotal = item.price * item.quantity;
+            content += `
+                <tr>
+                    <td>${item.product ? item.product.name : 'Sản phẩm không xác định'}</td>
+                    <td>${item.quantity}</td>
+                    <td>${formatCurrency(item.price)}</td>
+                    <td>${formatCurrency(subtotal)}</td>
+                </tr>
+            `;
+        });
+    } else {
+        content += `
+            <tr>
+                <td colspan="4" class="text-center">Không có sản phẩm nào</td>
+            </tr>
+        `;
+    }
+
+    content += `
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-3">
+            <button class="btn btn-secondary" onclick="loadOrders()">
+                <i class="fa fa-arrow-left"></i> Quay lại danh sách đơn hàng
+            </button>
+            ${(order.status === 'PENDING' || order.status === 'CONFIRMED') ? `
+                <button class="btn btn-danger ml-2" onclick="cancelOrder(${order.id})">
+                    <i class="fa fa-times"></i> Hủy đơn hàng
+                </button>
+            ` : ''}
+        </div>
+    `;
+
+    showDynamicContent(title, content);
+}
+
+
+
+// Cancel order function (placeholder - not functional)
+function cancelOrder(orderId) {
+    alert('Chức năng hủy đơn hàng đang được phát triển');
+}
+
+// Show alert function
+function showAlert(type, message) {
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type} alert-dismissible fade show`;
+    alertDiv.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert">
+            <span>&times;</span>
+        </button>
+    `;
+
+    const contentBody = document.getElementById('content-body');
+    contentBody.insertBefore(alertDiv, contentBody.firstChild);
+
+    // Auto dismiss after 5 seconds
+    setTimeout(() => {
+        if (alertDiv.parentNode) {
+            alertDiv.remove();
+        }
+    }, 5000);
+}
+
+// Payment status utility functions
+function getPaymentStatusColor(status) {
+    const colors = {
+        'PENDING': 'warning',
+        'PAID': 'success',
+        'FAILED': 'danger',
+        'REFUNDED': 'info'
+    };
+    return colors[status] || 'secondary';
+}
+
+function getPaymentStatusText(status) {
+    const texts = {
+        'PENDING': 'Chờ thanh toán',
+        'PAID': 'Đã thanh toán',
+        'FAILED': 'Thanh toán thất bại',
+        'REFUNDED': 'Đã hoàn tiền'
+    };
+    return texts[status] || status;
+}
+
+// Get current user data from Thymeleaf
+const currentUser = {
+    firstname: /*[[${currentUser?.firstname}]]*/ '',
+    lastname: /*[[${currentUser?.lastname}]]*/ '',
+    phone: /*[[${currentUser?.phone}]]*/ '',
+    email: /*[[${currentUser?.email}]]*/ '',
+    address: /*[[${currentUser?.address}]]*/ '',
+    deliveryAddress: /*[[${currentUser?.deliveryAddress}]]*/ ''
+};
+
+// Address management functions
+function editMainAddress() {
+    document.getElementById('mainAddressForm').style.display = 'block';
+    document.getElementById('deliveryAddressForm').style.display = 'none';
+    document.getElementById('mainAddressInput').focus();
+}
+
+function editDeliveryAddress() {
+    document.getElementById('deliveryAddressForm').style.display = 'block';
+    document.getElementById('mainAddressForm').style.display = 'none';
+    document.getElementById('deliveryAddressInput').focus();
+}
+
+function cancelAddressEdit() {
+    document.getElementById('mainAddressForm').style.display = 'none';
+    document.getElementById('deliveryAddressForm').style.display = 'none';
+}
+
+function updateMainAddress(event) {
+    event.preventDefault();
+
+    const address = document.getElementById('mainAddressInput').value.trim();
+    if (!address) {
+        showAlert('danger', 'Vui lòng nhập địa chỉ chính');
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append('address', address);
+
+    fetch('/account/address/main/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Cập nhật địa chỉ chính thành công');
+            currentUser.address = address;
+            cancelAddressEdit();
+            setTimeout(() => loadAddressSettings(), 1000);
+        } else {
+            showAlert('danger', data.error || 'Có lỗi xảy ra khi cập nhật địa chỉ');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Có lỗi xảy ra khi cập nhật địa chỉ');
+    });
+}
+
+function updateDeliveryAddress(event) {
+    event.preventDefault();
+
+    const address = document.getElementById('deliveryAddressInput').value.trim();
+
+    const formData = new FormData();
+    formData.append('deliveryAddress', address);
+
+    fetch('/account/address/delivery/update', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            showAlert('success', 'Cập nhật địa chỉ giao hàng thành công');
+            currentUser.deliveryAddress = address;
+            cancelAddressEdit();
+            setTimeout(() => loadAddressSettings(), 1000);
+        } else {
+            showAlert('danger', data.error || 'Có lỗi xảy ra khi cập nhật địa chỉ');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showAlert('danger', 'Có lỗi xảy ra khi cập nhật địa chỉ');
+    });
+}
+
+
+
+// Check for hash on page load to auto-open address section
+document.addEventListener('DOMContentLoaded', function() {
+    if (window.location.hash === '#addresses') {
+        loadAddressSettings();
+    }
+});
+</script>
 
 <div th:replace="~{fragments/my-fragments.html::footer}"/>
 </body>

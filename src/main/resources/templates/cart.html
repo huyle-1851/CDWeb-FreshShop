@@ -41,7 +41,6 @@
 <!-- End All Title Box -->
 
 <!-- Start Cart -->
-<div th:with="totals"/>
 <div class="cart-box-main">
     <div class="container">
         <div class="row">
@@ -60,48 +59,65 @@
                         </thead>
                         <tbody>
                         <th:block th:each="item, state: ${cart}">
-                            <div th:with="product=${item.getProduct()}"/>
-                            <div th:with="url='product-detail?id=${product.getId()}'"/>
-                            <tr th:id="item${state.index}">
-                                <td class="thumbnail-img">
-                                    <a href="${url}">
-                                        <img class="img-fluid" src="${product.getImages()[0]}" alt=""/>
-                                    </a>
-                                </td>
-                                <td class="name-pr">
-                                    <a href="${url}">
-                                        ${product.getName()}
-                                    </a>
-                                </td>
-                                <td class="price-pr">
-                                    <p>
-                                    <div th:with="check=${product.getDiscountedPrice()==0||product.getDiscountedPrice()==product.getPrice()}"/>
-                                    <div th:with="price=0"/>
-                                    <div th:if="${check}">${product.getPrice()}đ
-                                        <div th:with="price=${product.getPrice()}"/>
-                                    </div>
-                                    <div th:unless="${check}">${product.getDiscountedPrice()}đ
-                                        <div th:with="price=${product.getDiscountedPrice()}"/>
-                                    </div>
-                                    </p>
-                                </td>
-                                <td class="quantity-box"><input id="${index.index}" type="number" size="4"
-                                                                value="${item.getQuantity()}"
-                                                                min="1" step="1"
-                                                                class="c-input-text qty text"
-                                                                th:onchange="addItems(${product.getId()},${price},${cart.size()},this,false)">
-                                </td>
-                                <td class="total-pr">
-                                    <p id="total-pr${index.index}"
-                                       data-value="${price * item.getQuantity()}">${price * item.getQuantity()}đ</p>
-                                    <div th:with="tmp=${totals = totals + (price * item.getQuantity())}"/>
-                                </td>
-                                <td>
-                                    <button style="border: none; background: none; cursor: pointer;"
-                                            th:onclick="removeItem(${product.getId()},${index.index}, ${cart.size()})"><i
-                                            class="fas fa-times"></i></button>
-                                </td>
-                            </tr>
+                            <th:block th:with="product=${item.getProduct()}">
+                                <th:block th:with="url=@{/product-detail(id=${product.getId()})}">
+                                    <th:block th:with="isDiscounted=${product.getDiscountedPrice() != null and product.getDiscountedPrice() > 0 and product.getDiscountedPrice() != product.getPrice()}">
+                                        <th:block th:with="itemPrice=${isDiscounted ? product.getDiscountedPrice() : product.getPrice()}">
+                                            <th:block th:with="itemTotal=${itemPrice * item.getQuantity()}">
+                                                <tr th:id="'item' + ${state.index}">
+                                                    <td class="thumbnail-img">
+                                                        <a th:href="${url}">
+                                                            <img class="img-fluid"
+                                                                 th:src="${product.getImages() != null and !product.getImages().isEmpty() ? product.getImages()[0].getUrl() : '/images/img-pro-01.jpg'}"
+                                                                 alt="Product Image"/>
+                                                        </a>
+                                                    </td>
+                                                    <td class="name-pr">
+                                                        <a th:href="${url}" th:text="${product.getName()}">
+                                                            Product Name
+                                                        </a>
+                                                    </td>
+                                                    <td class="price-pr">
+                                                        <p>
+                                                            <span th:if="${!isDiscounted}" th:text="${product.getPrice()} + 'đ'">Price</span>
+                                                            <span th:if="${isDiscounted}" th:text="${product.getDiscountedPrice()} + 'đ'">Discounted Price</span>
+                                                        </p>
+                                                    </td>
+                                                    <td class="quantity-box">
+                                                        <div class="quantity-input-wrapper" style="display: flex; align-items: center; max-width: 120px;">
+                                                            <button type="button" class="quantity-btn"
+                                                                    th:onclick="'decreaseCartQuantity(' + ${state.index} + ',' + ${product.getId()} + ',' + ${itemPrice} + ')'"
+                                                                    style="background: #f8f9fa; border: 1px solid #ddd; padding: 5px 8px; cursor: pointer;">-</button>
+                                                            <input th:id="'qty-' + ${state.index}"
+                                                                   type="number"
+                                                                   th:value="${item.getQuantity()}"
+                                                                   min="1"
+                                                                   step="1"
+                                                                   class="c-input-text qty text"
+                                                                   style="border: 1px solid #ddd; text-align: center; width: 60px; padding: 5px;"
+                                                                   th:onchange="'updateCartItem(' + ${state.index} + ',' + ${product.getId()} + ',' + ${itemPrice} + ',this)'">
+                                                            <button type="button" class="quantity-btn"
+                                                                    th:onclick="'increaseCartQuantity(' + ${state.index} + ',' + ${product.getId()} + ',' + ${itemPrice} + ')'"
+                                                                    style="background: #f8f9fa; border: 1px solid #ddd; padding: 5px 8px; cursor: pointer;">+</button>
+                                                        </div>
+                                                    </td>
+                                                    <td class="total-pr">
+                                                        <p th:id="'total-pr' + ${state.index}"
+                                                           th:data-value="${itemTotal}"
+                                                           th:text="${itemTotal} + 'đ'">Total</p>
+                                                    </td>
+                                                    <td>
+                                                        <button style="border: none; background: none; cursor: pointer;"
+                                                                th:onclick="'removeItem(' + ${product.getId()} + ',' + ${state.index} + ',' + ${cart.size()} + ')'">
+                                                            <i class="fas fa-times"></i>
+                                                        </button>
+                                                    </td>
+                                                </tr>
+                                            </th:block>
+                                        </th:block>
+                                    </th:block>
+                                </th:block>
+                            </th:block>
                         </th:block>
                         </tbody>
                     </table>
@@ -116,12 +132,13 @@
                     <div class="d-flex">
                         <h4>Tổng cộng</h4>
                         <div id="total-bill"
-                             class="ml-auto font-weight-bold">${totals}đ
+                             class="ml-auto font-weight-bold" th:text="${total} + 'đ'">
+                            Total Amount
                         </div>
                     </div>
                 </div>
             </div>
-            <div class="col-12 d-flex shopping-box"><a href="checkout.jsp" class="ml-auto btn hvr-hover">Thanh
+            <div class="col-12 d-flex shopping-box"><a href="/checkout" class="ml-auto btn hvr-hover">Thanh
                 Toán</a></div>
         </div>
 
@@ -130,5 +147,269 @@
 <!-- End Cart -->
 
 <div th:replace="~{fragments/my-fragments.html::footer}"/>
+<div th:replace="~{fragments/my-fragments.html::script}"/>
+
+<script>
+// Enhanced cart quantity management with real-time total updates
+function increaseCartQuantity(index, productId, itemPrice) {
+    const input = document.getElementById('qty-' + index);
+    const currentValue = parseInt(input.value) || 1;
+    input.value = currentValue + 1;
+    updateCartItem(index, productId, itemPrice, input);
+}
+
+function decreaseCartQuantity(index, productId, itemPrice) {
+    const input = document.getElementById('qty-' + index);
+    const currentValue = parseInt(input.value) || 1;
+    if (currentValue > 1) {
+        input.value = currentValue - 1;
+        updateCartItem(index, productId, itemPrice, input);
+    }
+}
+
+function updateCartItem(index, productId, itemPrice, input) {
+    const quantity = parseInt(input.value) || 1;
+
+    // Validate quantity
+    if (quantity < 1) {
+        input.value = 1;
+        return;
+    }
+
+    // Calculate new item total
+    const itemTotal = itemPrice * quantity;
+
+    // Update item total display immediately
+    const totalElement = document.getElementById('total-pr' + index);
+    if (totalElement) {
+        totalElement.setAttribute('data-value', itemTotal);
+        totalElement.textContent = formatPrice(itemTotal);
+    }
+
+    // Update grand total immediately
+    updateGrandTotal();
+
+    // Send update to server (debounced)
+    clearTimeout(window.cartUpdateTimeout);
+    window.cartUpdateTimeout = setTimeout(() => {
+        updateCartOnServer(productId, quantity);
+    }, 500);
+}
+
+function updateGrandTotal() {
+    let grandTotal = 0;
+
+    // Sum all item totals
+    const totalElements = document.querySelectorAll('[id^="total-pr"]');
+    totalElements.forEach(element => {
+        const value = parseInt(element.getAttribute('data-value')) || 0;
+        grandTotal += value;
+    });
+
+    // Update grand total display
+    const grandTotalElement = document.getElementById('total-bill');
+    if (grandTotalElement) {
+        grandTotalElement.textContent = formatPrice(grandTotal);
+    }
+}
+
+function updateCartOnServer(productId, quantity) {
+    fetch('/add-item', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: `idP=${productId}&quan=${quantity}&cumulative=false`
+    })
+    .then(response => response.text())
+    .then(data => {
+        console.log('Cart updated on server:', data);
+        // Update cart badge
+        updateCartBadge();
+    })
+    .catch(error => {
+        console.error('Error updating cart on server:', error);
+        // Show error message
+        showCartMessage('Có lỗi xảy ra khi cập nhật giỏ hàng!', 'error');
+    });
+}
+
+function formatPrice(price) {
+    return price.toLocaleString('vi-VN') + 'đ';
+}
+
+function updateCartBadge() {
+    fetch('/cart-count', {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        const cartBadge = document.querySelector('#cart-badge');
+        if (cartBadge && data.count !== undefined) {
+            cartBadge.textContent = data.count;
+        }
+
+        const oldCartBadge = document.querySelector('.attr-nav .badge');
+        if (oldCartBadge && data.count !== undefined) {
+            oldCartBadge.textContent = data.count;
+        }
+    })
+    .catch(error => {
+        console.error('Error updating cart badge:', error);
+    });
+}
+
+function showCartMessage(message, type = 'info') {
+    const messageDiv = document.createElement('div');
+
+    let alertClass = 'alert-info';
+    let bgColor = '#d1ecf1';
+    let textColor = '#0c5460';
+
+    if (type === 'success') {
+        alertClass = 'alert-success';
+        bgColor = '#d4edda';
+        textColor = '#155724';
+    } else if (type === 'error') {
+        alertClass = 'alert-danger';
+        bgColor = '#f8d7da';
+        textColor = '#721c24';
+    }
+
+    messageDiv.className = `alert ${alertClass} alert-dismissible fade show`;
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        z-index: 9999;
+        min-width: 300px;
+        background-color: ${bgColor};
+        color: ${textColor};
+        border: 1px solid ${textColor}33;
+        border-radius: 5px;
+        padding: 15px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    `;
+
+    messageDiv.innerHTML = `
+        ${message}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close" style="color: ${textColor};">
+            <span aria-hidden="true">&times;</span>
+        </button>
+    `;
+
+    document.body.appendChild(messageDiv);
+
+    // Auto remove after 3 seconds
+    setTimeout(() => {
+        if (messageDiv.parentNode) {
+            messageDiv.parentNode.removeChild(messageDiv);
+        }
+    }, 3000);
+}
+
+// Enhanced remove item function
+function removeItem(productId, indexItem, sizeList) {
+    if (confirm('Bạn có chắc chắn muốn xóa sản phẩm này khỏi giỏ hàng?')) {
+        fetch('/remove-item-cart', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `idP=${productId}`
+        })
+        .then(response => response.text())
+        .then(data => {
+            console.log('Item removed:', data);
+            // Remove item from DOM
+            const itemElement = document.getElementById('item' + indexItem);
+            if (itemElement) {
+                itemElement.remove();
+            }
+            // Update grand total
+            updateGrandTotal();
+            // Update cart badge
+            updateCartBadge();
+            // Show success message
+            showCartMessage('Đã xóa sản phẩm khỏi giỏ hàng!', 'success');
+        })
+        .catch(error => {
+            console.error('Error removing item:', error);
+            showCartMessage('Có lỗi xảy ra khi xóa sản phẩm!', 'error');
+        });
+    }
+}
+</script>
+
+<style>
+/* Enhanced cart styling */
+.quantity-input-wrapper {
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.quantity-btn {
+    transition: all 0.2s ease;
+    font-weight: bold;
+    user-select: none;
+}
+
+.quantity-btn:hover {
+    background-color: #b0b435 !important;
+    color: white !important;
+    border-color: #b0b435 !important;
+}
+
+.quantity-btn:active {
+    transform: scale(0.95);
+}
+
+.c-input-text.qty {
+    border-left: none !important;
+    border-right: none !important;
+    outline: none;
+    box-shadow: none;
+}
+
+.c-input-text.qty:focus {
+    outline: none;
+    box-shadow: none;
+    border-color: #b0b435;
+}
+
+/* Remove number input arrows */
+.c-input-text.qty::-webkit-outer-spin-button,
+.c-input-text.qty::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.c-input-text.qty[type=number] {
+    -moz-appearance: textfield;
+}
+
+/* Total amount styling */
+#total-bill {
+    font-size: 1.2em;
+    color: #b0b435;
+    font-weight: bold;
+}
+
+/* Cart table improvements */
+.table td {
+    vertical-align: middle;
+}
+
+.total-pr p {
+    margin: 0;
+    font-weight: 600;
+    color: #333;
+}
+</style>
+
 </body>
 </html>
