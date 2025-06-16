@@ -100,6 +100,22 @@
                             <span class="font-weight-bold" th:text="${#numbers.formatInteger(product.price, 0, 'COMMA')} + 'đ'"></span>
                         </th:block>
                     </h5>
+
+                    <!-- Product Status Display -->
+                    <div class="product-status mb-3">
+                        <h4>Trạng thái:</h4>
+                        <th:block th:if="${product.status == 'ACTIVE'}">
+                            <span class="badge badge-success">Hoạt động</span>
+                        </th:block>
+                        <th:block th:if="${product.status == 'PAUSED'}">
+                            <span class="badge badge-warning">Tạm dừng</span>
+                            <p class="text-warning mt-2"><i class="fa fa-exclamation-triangle"></i> Sản phẩm này hiện đang tạm dừng bán</p>
+                        </th:block>
+                        <th:block th:if="${product.status == 'INACTIVE'}">
+                            <span class="badge badge-danger">Không hoạt động</span>
+                        </th:block>
+                    </div>
+
                     <h4>Mô tả:</h4>
                     <p th:text="${product.description != null ? product.description : 'Chưa có mô tả'}"></p>
 
@@ -119,15 +135,39 @@
 
                     <div class="price-box-bar">
                         <div class="cart-and-bay-btn">
-                            <button class="btn hvr-hover" onclick="buyNow()"
-                                    th:data-product-id="${product.id}">
-                                Mua ngay
-                            </button>
+                            <!-- Show buttons based on product status -->
+                            <th:block th:if="${product.status == 'ACTIVE'}">
+                                <button class="btn hvr-hover" onclick="buyNow()"
+                                        th:data-product-id="${product.id}">
+                                    Mua ngay
+                                </button>
 
-                            <button class="btn hvr-hover" style="color: white" onclick="addToCart()"
-                                    th:data-product-id="${product.id}">
-                                Thêm vào giỏ hàng
-                            </button>
+                                <button class="btn hvr-hover" style="color: white" onclick="addToCart()"
+                                        th:data-product-id="${product.id}">
+                                    Thêm vào giỏ hàng
+                                </button>
+                            </th:block>
+
+                            <!-- Disabled buttons for paused products -->
+                            <th:block th:if="${product.status == 'PAUSED'}">
+                                <button class="btn btn-secondary disabled" disabled
+                                        style="cursor: not-allowed; opacity: 0.6;">
+                                    Không thể mua
+                                </button>
+
+                                <button class="btn btn-secondary disabled" disabled
+                                        style="cursor: not-allowed; opacity: 0.6;">
+                                    Tạm dừng bán
+                                </button>
+                            </th:block>
+
+                            <!-- Disabled buttons for inactive products -->
+                            <th:block th:if="${product.status == 'INACTIVE'}">
+                                <button class="btn btn-danger disabled" disabled
+                                        style="cursor: not-allowed; opacity: 0.6;">
+                                    Không khả dụng
+                                </button>
+                            </th:block>
                         </div>
                     </div>
                 </div>
@@ -399,7 +439,9 @@ function addToCart() {
             updateCartCount();
         },
         error: function(xhr, status, error) {
-            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+            // Show the error message from server
+            const errorMessage = xhr.responseText || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!';
+            alert(errorMessage);
         }
     });
 }
@@ -420,7 +462,9 @@ function buyNow() {
             window.location.href = '/cart';
         },
         error: function(xhr, status, error) {
-            alert('Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!');
+            // Show the error message from server
+            const errorMessage = xhr.responseText || 'Có lỗi xảy ra khi thêm sản phẩm vào giỏ hàng!';
+            alert(errorMessage);
         }
     });
 }

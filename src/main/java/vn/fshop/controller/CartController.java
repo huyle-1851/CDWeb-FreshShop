@@ -42,6 +42,11 @@ public class CartController extends BaseController {
                 return ResponseEntity.badRequest().body("Product not found");
             }
 
+            // Check if product is purchasable (only ACTIVE products can be added to cart)
+            if (!product.isPurchasable()) {
+                return ResponseEntity.badRequest().body("Sản phẩm này hiện không thể mua. Trạng thái: " + product.getStatusDisplay());
+            }
+
             List<CartItem> cart = getCartFromSession(session);
             
             // Check if product already exists in cart

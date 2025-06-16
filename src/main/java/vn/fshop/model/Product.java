@@ -52,4 +52,30 @@ public class Product {
     @Column
     @Min(value = 0, message = "Quantity must be positive")
     private Integer quantity = 0;
+
+    // Helper methods for status
+    public boolean isActive() {
+        return "ACTIVE".equals(this.status);
+    }
+
+    public boolean isPaused() {
+        return "PAUSED".equals(this.status);
+    }
+
+    public boolean isInactive() {
+        return "INACTIVE".equals(this.status);
+    }
+
+    public boolean isPurchasable() {
+        return isActive();
+    }
+
+    public String getStatusDisplay() {
+        switch (this.status) {
+            case "ACTIVE": return "Hoạt động";
+            case "PAUSED": return "Tạm dừng";
+            case "INACTIVE": return "Không hoạt động";
+            default: return this.status;
+        }
+    }
 }

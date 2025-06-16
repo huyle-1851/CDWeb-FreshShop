@@ -9,6 +9,7 @@ import vn.fshop.repository.CategoryRepository;
 import vn.fshop.repository.ProductRepository;
 import vn.fshop.repository.ImageRepository;
 
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -29,17 +30,22 @@ public class ProductService {
 
     public List<Product> getProductsByName(String namePattern) {
         if (namePattern == null || namePattern.trim().isEmpty()) {
-            return getAllProduct();
+            return getVisibleProducts();
         }
-        return productRepository.searchProductsWithImages(namePattern.trim());
+        return productRepository.searchVisibleProductsWithImages(namePattern.trim());
     }
 
     public List<Product> getProductsByCategoryId(Integer categoryId) {
-        return productRepository.findProductsByCategoryIdWithImages(categoryId);
+        return productRepository.findVisibleProductsByCategoryIdWithImages(categoryId);
     }
 
     public List<Product> getAllProduct() {
         return productRepository.findAllWithImages();
+    }
+
+    // Get products visible in shop (ACTIVE and PAUSED)
+    public List<Product> getVisibleProducts() {
+        return productRepository.findVisibleProductsWithImages();
     }
 
     public List<Product> getActiveProducts() {
@@ -106,8 +112,34 @@ public class ProductService {
             throw new RuntimeException("Product not found with id: " + id);
         }
 
-        boolean isActive = "ACTIVE".equals(product.getStatus());
-        product.setStatus(isActive ? "INACTIVE" : "ACTIVE");
+        // Cycle through statuses: ACTIVE -> PAUSED -> INACTIVE -> ACTIVE
+        switch (product.getStatus()) {
+            case "ACTIVE":
+                product.setStatus("PAUSED");
+                break;
+            case "PAUSED":
+                product.setStatus("INACTIVE");
+                break;
+            case "INACTIVE":
+            default:
+                product.setStatus("ACTIVE");
+                break;
+        }
+        return productRepository.save(product);
+    }
+
+    public Product updateProductStatus(Integer id, String status) {
+        Product product = productRepository.findById(id).orElse(null);
+        if (product == null) {
+            throw new RuntimeException("Product not found with id: " + id);
+        }
+
+        // Validate status
+        if (!Arrays.asList("ACTIVE", "PAUSED", "INACTIVE").contains(status)) {
+            throw new RuntimeException("Invalid status: " + status);
+        }
+
+        product.setStatus(status);
         return productRepository.save(product);
     }
 

@@ -42,13 +42,13 @@ public class ShopController extends BaseController {
 			List<Category> categories = categoryService.getAllCategory();
 			model.addAttribute("categories", categories);
 
-			// Get products
+			// Get products (visible in shop: ACTIVE and PAUSED)
 			List<Product> products;
 			if (categoryId != null) {
 				products = productService.getProductsByCategoryId(categoryId);
 				model.addAttribute("selectedCategoryId", categoryId);
 			} else {
-				products = productService.getAllProduct();
+				products = productService.getVisibleProducts();
 			}
 
 			model.addAttribute("products", products);
@@ -78,7 +78,7 @@ public class ShopController extends BaseController {
 					categoryName = category.getName();
 				}
 			} else {
-				products = productService.getAllProduct();
+				products = productService.getVisibleProducts();
 			}
 
 			// Convert products to include images
@@ -151,7 +151,7 @@ public class ShopController extends BaseController {
 				products = productService.getProductsByName(searchTerm.trim());
 				model.addAttribute("searchTerm", searchTerm.trim());
 			} else {
-				products = productService.getAllProduct();
+				products = productService.getVisibleProducts();
 			}
 
 			model.addAttribute("products", products);
@@ -176,7 +176,7 @@ public class ShopController extends BaseController {
 				products = productService.getProductsByName(searchTerm.trim());
 				resultMessage = "Kết quả tìm kiếm cho: \"" + searchTerm.trim() + "\"";
 			} else {
-				products = productService.getAllProduct();
+				products = productService.getVisibleProducts();
 				resultMessage = "Tất cả sản phẩm";
 			}
 

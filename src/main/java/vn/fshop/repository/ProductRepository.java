@@ -32,7 +32,22 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT p FROM Product p WHERE p.status = 'ACTIVE'")
     List<Product> findActiveProducts();
 
-    // Methods with eager fetching for images
+    // Find products that should be visible in shop (ACTIVE and PAUSED)
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.status IN ('ACTIVE', 'PAUSED')")
+    List<Product> findVisibleProductsWithImages();
+
+    // Find products by category that should be visible in shop
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.category.id = :categoryId AND p.status IN ('ACTIVE', 'PAUSED')")
+    List<Product> findVisibleProductsByCategoryIdWithImages(@Param("categoryId") Integer categoryId);
+
+    // Search visible products
+    @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE " +
+           "(LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
+           "LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "p.status IN ('ACTIVE', 'PAUSED')")
+    List<Product> searchVisibleProductsWithImages(@Param("searchTerm") String searchTerm);
+
+    // Methods with eager fetching for images (admin use - shows all products)
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images")
     List<Product> findAllWithImages();
 

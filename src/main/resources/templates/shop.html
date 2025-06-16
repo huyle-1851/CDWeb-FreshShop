@@ -91,17 +91,28 @@
 
                                     <!-- Add to Cart Button -->
                                     <div class="mask-icon">
-                                        <th:block th:if="${session.username != null}">
-                                            <a class="cart" style="cursor: pointer"
-                                               th:onclick="'updateCart(' + ${product.id} + '); showCartMessage(\'Sản phẩm đã được thêm vào giỏ hàng!\', \'success\');'">
-                                                Thêm vào giỏ
+                                        <!-- Show status badge for paused products -->
+                                        <th:block th:if="${product.status == 'PAUSED'}">
+                                            <span class="status-badge paused">Tạm dừng</span>
+                                            <a class="cart disabled" style="cursor: not-allowed; opacity: 0.6;"
+                                               onclick="showCartMessage('Sản phẩm này hiện đang tạm dừng bán!', 'warning');">
+                                                Không thể mua
                                             </a>
                                         </th:block>
-                                        <th:block th:if="${session.username == null}">
-                                            <a class="cart" style="cursor: pointer"
-                                               onclick="alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!'); window.location.href='/login';">
-                                                Thêm vào giỏ
-                                            </a>
+                                        <!-- Normal cart functionality for active products -->
+                                        <th:block th:if="${product.status == 'ACTIVE'}">
+                                            <th:block th:if="${session.username != null}">
+                                                <a class="cart" style="cursor: pointer"
+                                                   th:onclick="'updateCart(' + ${product.id} + '); showCartMessage(\'Sản phẩm đã được thêm vào giỏ hàng!\', \'success\');'">
+                                                    Thêm vào giỏ
+                                                </a>
+                                            </th:block>
+                                            <th:block th:if="${session.username == null}">
+                                                <a class="cart" style="cursor: pointer"
+                                                   onclick="alert('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!'); window.location.href='/login';">
+                                                    Thêm vào giỏ
+                                                </a>
+                                            </th:block>
                                         </th:block>
                                     </div>
                                 </div>
@@ -395,9 +406,21 @@ function createProductHTML(product) {
     const hasDiscount = product.discountedPrice && product.discountedPrice > 0 && product.discountedPrice !== product.price;
     const imageUrl = (product.images && product.images.length > 0) ? product.images[0].url : '/images/Tao Fuji Newzealand - 1kg.jpg';
 
-    const addToCartButton = isUserLoggedIn ?
-        `<a class="cart" style="cursor: pointer" onclick="updateCart(${product.id}); showCartMessage('Sản phẩm đã được thêm vào giỏ hàng!', 'success');">Thêm vào giỏ</a>` :
-        `<a class="cart" style="cursor: pointer" onclick="showCartMessage('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', 'info'); setTimeout(function() { window.location.href='/login'; }, 1500);">Thêm vào giỏ</a>`;
+    // Determine cart button based on product status
+    let addToCartButton = '';
+    let statusBadge = '';
+
+    if (product.status === 'PAUSED') {
+        statusBadge = '<span class="status-badge paused">Tạm dừng</span>';
+        addToCartButton = `<a class="cart disabled" style="cursor: not-allowed; opacity: 0.6;" onclick="showCartMessage('Sản phẩm này hiện đang tạm dừng bán!', 'warning');">Không thể mua</a>`;
+    } else if (product.status === 'ACTIVE') {
+        addToCartButton = isUserLoggedIn ?
+            `<a class="cart" style="cursor: pointer" onclick="updateCart(${product.id}); showCartMessage('Sản phẩm đã được thêm vào giỏ hàng!', 'success');">Thêm vào giỏ</a>` :
+            `<a class="cart" style="cursor: pointer" onclick="showCartMessage('Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!', 'info'); setTimeout(function() { window.location.href='/login'; }, 1500);">Thêm vào giỏ</a>`;
+    } else {
+        // INACTIVE products shouldn't appear in shop, but just in case
+        addToCartButton = `<a class="cart disabled" style="cursor: not-allowed; opacity: 0.6;">Không khả dụng</a>`;
+    }
 
     return `
         <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -416,6 +439,7 @@ function createProductHTML(product) {
                         </div>
                     </div>
                     <div class="mask-icon">
+                        ${statusBadge}
                         ${addToCartButton}
                     </div>
                 </div>
@@ -448,6 +472,40 @@ function createProductHTML(product) {
 .btn-primary:hover {
     background-color: #9a9e2f;
     border-color: #9a9e2f;
+}
+
+/* Product Status Badges */
+.status-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: bold;
+    z-index: 10;
+    color: white;
+}
+
+.status-badge.paused {
+    background-color: #ffc107;
+    color: #212529;
+}
+
+.status-badge.inactive {
+    background-color: #dc3545;
+}
+
+/* Disabled cart button styling */
+.cart.disabled {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+}
+
+.cart.disabled:hover {
+    background-color: #6c757d !important;
+    border-color: #6c757d !important;
+    transform: none !important;
 }
 
 .list-group-item.active {

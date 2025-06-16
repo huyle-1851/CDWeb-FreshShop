@@ -189,11 +189,29 @@ public class AdminController extends BaseController {
             Product product = productService.toggleProductStatus(id);
             Map<String, Object> response = new HashMap<>();
             response.put("product", product);
-            response.put("message", "Trạng thái sản phẩm đã được cập nhật");
+            response.put("message", "Trạng thái sản phẩm đã được cập nhật thành: " + product.getStatusDisplay());
             response.put("success", true);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Failed to toggle status: " + e.getMessage()));
+        }
+    }
+
+    @PostMapping("/products/{id}/update-status")
+    @ResponseBody
+    public ResponseEntity<Map<String, Object>> updateProductStatus(@PathVariable Integer id, @RequestParam String status, HttpSession session) {
+        if (!isAdmin(session)) {
+            return ResponseEntity.status(403).body(Map.of("error", "Access denied"));
+        }
+        try {
+            Product product = productService.updateProductStatus(id, status);
+            Map<String, Object> response = new HashMap<>();
+            response.put("product", product);
+            response.put("message", "Trạng thái sản phẩm đã được cập nhật thành: " + product.getStatusDisplay());
+            response.put("success", true);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Failed to update status: " + e.getMessage()));
         }
     }
 
