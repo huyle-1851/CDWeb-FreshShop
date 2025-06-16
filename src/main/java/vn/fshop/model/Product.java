@@ -72,8 +72,8 @@ public class Product {
 
     public String getStatusDisplay() {
         switch (this.status) {
-            case "ACTIVE": return "Hoạt động";
-            case "PAUSED": return "Tạm dừng";
+            case "ACTIVE": return "Còn bán";
+            case "PAUSED": return "Hết hàng";
             case "INACTIVE": return "Không hoạt động";
             default: return this.status;
         }

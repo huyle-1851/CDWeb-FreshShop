@@ -306,9 +306,20 @@
             `;
 
             products.forEach(product => {
-                const statusBadge = product.status === 'ACTIVE'
-                    ? '<span class="badge badge-success">Hoạt động</span>'
-                    : '<span class="badge badge-secondary">Tạm dừng</span>';
+                let statusBadge = '';
+                switch(product.status) {
+                    case 'ACTIVE':
+                        statusBadge = '<span class="badge badge-success"><i class="fa fa-check-circle"></i> Còn bán</span>';
+                        break;
+                    case 'PAUSED':
+                        statusBadge = '<span class="badge badge-danger"><i class="fa fa-times-circle"></i> Hết hàng</span>';
+                        break;
+                    case 'INACTIVE':
+                        statusBadge = '<span class="badge badge-secondary"><i class="fa fa-ban"></i> Không hoạt động</span>';
+                        break;
+                    default:
+                        statusBadge = '<span class="badge badge-secondary">' + product.status + '</span>';
+                }
 
                 const discountedPrice = product.discountedPrice && product.discountedPrice !== product.price
                     ? formatCurrency(product.discountedPrice)
@@ -337,10 +348,10 @@
                                 <button class="btn btn-sm btn-info" onclick="editProduct(${product.id})" title="Chỉnh sửa">
                                     <i class="fa fa-edit"></i>
                                 </button>
-                                <button class="btn btn-sm ${product.status === 'ACTIVE' ? 'btn-warning' : 'btn-success'}"
+                                <button class="btn btn-sm ${getStatusButtonClass(product.status)}"
                                         onclick="toggleProductStatus(${product.id})"
-                                        title="${product.status === 'ACTIVE' ? 'Tạm dừng' : 'Kích hoạt'}">
-                                    <i class="fa fa-${product.status === 'ACTIVE' ? 'pause' : 'play'}"></i>
+                                        title="${getStatusButtonTitle(product.status)}">
+                                    <i class="fa fa-${getStatusButtonIcon(product.status)}"></i>
                                 </button>
                                 <button class="btn btn-sm btn-danger" onclick="deleteProduct(${product.id})" title="Xóa">
                                     <i class="fa fa-trash"></i>
@@ -449,6 +460,34 @@
                 console.error('Error:', error);
                 showError('Có lỗi xảy ra khi lưu sản phẩm');
             });
+        }
+
+        // Helper functions for status button display
+        function getStatusButtonClass(status) {
+            switch(status) {
+                case 'ACTIVE': return 'btn-warning';
+                case 'PAUSED': return 'btn-success';
+                case 'INACTIVE': return 'btn-info';
+                default: return 'btn-secondary';
+            }
+        }
+
+        function getStatusButtonTitle(status) {
+            switch(status) {
+                case 'ACTIVE': return 'Đánh dấu hết hàng';
+                case 'PAUSED': return 'Ẩn sản phẩm';
+                case 'INACTIVE': return 'Đưa lên bán';
+                default: return 'Thay đổi trạng thái';
+            }
+        }
+
+        function getStatusButtonIcon(status) {
+            switch(status) {
+                case 'ACTIVE': return 'times-circle';
+                case 'PAUSED': return 'ban';
+                case 'INACTIVE': return 'check-circle';
+                default: return 'question';
+            }
         }
 
         // Toggle product status

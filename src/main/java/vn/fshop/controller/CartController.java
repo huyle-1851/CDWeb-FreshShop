@@ -44,7 +44,7 @@ public class CartController extends BaseController {
 
             // Check if product is purchasable (only ACTIVE products can be added to cart)
             if (!product.isPurchasable()) {
-                return ResponseEntity.badRequest().body("Sản phẩm này hiện không thể mua. Trạng thái: " + product.getStatusDisplay());
+                return ResponseEntity.badRequest().body("Sản phẩm này hiện đã hết hàng và không thể mua!");
             }
 
             List<CartItem> cart = getCartFromSession(session);

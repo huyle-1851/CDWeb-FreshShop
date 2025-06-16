@@ -221,8 +221,14 @@
                 <div class="products-single fix">
                     <div class="box-img-hover">
                         <div class="type-lb">
-
-                            <p th:if="${item.status != null}" class="sale" th:text="${item.status}"></p>
+                            <!-- Show status badge for out of stock products -->
+                            <th:block th:if="${item.status == 'PAUSED'}">
+                                <p class="sale out-of-stock">Hết hàng</p>
+                            </th:block>
+                            <!-- Show discount badge if applicable -->
+                            <th:block th:if="${item.status == 'ACTIVE' and item.discountedPrice != null and item.discountedPrice > 0 and item.discountedPrice != item.price}">
+                                <p class="sale discount">Khuyến mãi</p>
+                            </th:block>
                         </div>
                         <div style="width: 255px; height: 241px">
                             <img th:src="${item.images[0]}" class="img-fluid" alt="Image">
@@ -237,15 +243,23 @@
                                     <div th:with="price=${item.getDiscountedPrice()}"/>
                                 </div>
                             </th:block>
-                            <th:block th:if="${username!=null}">
-                                <a class="cart" style="cursor: pointer"
-                                   th:onclick="'updateCart(\'' + ${item.id} + '\'); showCartMessage(\'Sản phẩm đã được thêm vào giỏ hàng!\', \'success\');'">
-                                    Thêm vào giỏ</a>
+                            <!-- Cart buttons based on product status -->
+                            <th:block th:if="${item.status == 'PAUSED'}">
+                                <a class="cart disabled" style="cursor: not-allowed; opacity: 0.6;"
+                                   onclick="showCartMessage('Sản phẩm này hiện đã hết hàng!', 'warning');">
+                                    Hết hàng</a>
                             </th:block>
-                            <th:block th:if="${username==null}">
-                                <a class="cart" style="cursor: pointer"
-                                   th:onclick="'showCartMessage(\'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!\', \'info\'); setTimeout(function() { window.location.href=\'/login\'; }, 1500);'">
-                                    Thêm vào giỏ</a>
+                            <th:block th:if="${item.status == 'ACTIVE'}">
+                                <th:block th:if="${username!=null}">
+                                    <a class="cart" style="cursor: pointer"
+                                       th:onclick="'updateCart(\'' + ${item.id} + '\'); showCartMessage(\'Sản phẩm đã được thêm vào giỏ hàng!\', \'success\');'">
+                                        Thêm vào giỏ</a>
+                                </th:block>
+                                <th:block th:if="${username==null}">
+                                    <a class="cart" style="cursor: pointer"
+                                       th:onclick="'showCartMessage(\'Vui lòng đăng nhập để thêm sản phẩm vào giỏ hàng!\', \'info\'); setTimeout(function() { window.location.href=\'/login\'; }, 1500);'">
+                                        Thêm vào giỏ</a>
+                                </th:block>
                             </th:block>
                         </div>
                     </div>

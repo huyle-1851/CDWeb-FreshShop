@@ -103,16 +103,16 @@
 
                     <!-- Product Status Display -->
                     <div class="product-status mb-3">
-                        <h4>Trạng thái:</h4>
+                        <h4>Tình trạng:</h4>
                         <th:block th:if="${product.status == 'ACTIVE'}">
-                            <span class="badge badge-success">Hoạt động</span>
+                            <span class="badge badge-success"><i class="fa fa-check-circle"></i> Còn bán</span>
                         </th:block>
                         <th:block th:if="${product.status == 'PAUSED'}">
-                            <span class="badge badge-warning">Tạm dừng</span>
-                            <p class="text-warning mt-2"><i class="fa fa-exclamation-triangle"></i> Sản phẩm này hiện đang tạm dừng bán</p>
+                            <span class="badge badge-danger"><i class="fa fa-times-circle"></i> Hết hàng</span>
+                            <p class="text-danger mt-2"><i class="fa fa-exclamation-triangle"></i> Sản phẩm này hiện đã hết hàng</p>
                         </th:block>
                         <th:block th:if="${product.status == 'INACTIVE'}">
-                            <span class="badge badge-danger">Không hoạt động</span>
+                            <span class="badge badge-secondary">Không hoạt động</span>
                         </th:block>
                     </div>
 
@@ -148,16 +148,16 @@
                                 </button>
                             </th:block>
 
-                            <!-- Disabled buttons for paused products -->
+                            <!-- Disabled buttons for out of stock products -->
                             <th:block th:if="${product.status == 'PAUSED'}">
-                                <button class="btn btn-secondary disabled" disabled
+                                <button class="btn btn-danger disabled" disabled
                                         style="cursor: not-allowed; opacity: 0.6;">
-                                    Không thể mua
+                                    <i class="fa fa-times-circle"></i> Hết hàng
                                 </button>
 
-                                <button class="btn btn-secondary disabled" disabled
+                                <button class="btn btn-danger disabled" disabled
                                         style="cursor: not-allowed; opacity: 0.6;">
-                                    Tạm dừng bán
+                                    <i class="fa fa-ban"></i> Không thể mua
                                 </button>
                             </th:block>
 
