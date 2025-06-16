@@ -409,3 +409,95 @@ li.side-menu.cart-dropdown {
     align-items: center !important;
     display: flex !important;
 }
+
+/* Order Detail Modal Styling */
+.order-detail-modal {
+    max-width: 95% !important;
+    width: 95% !important;
+}
+
+.order-detail-modal .modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.order-detail-modal .modal-header {
+    background: linear-gradient(45deg, #007bff, #0056b3);
+    color: white;
+    border-radius: 12px 12px 0 0;
+    padding: 20px 30px;
+}
+
+.order-detail-modal .modal-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.order-detail-modal .modal-body {
+    padding: 30px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+.order-detail-modal .modal-footer {
+    padding: 20px 30px;
+    border-top: 1px solid #e9ecef;
+}
+
+/* Order detail cards styling */
+.order-detail-modal .card {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.order-detail-modal .card-header {
+    background-color: #f8f9fa;
+    border-bottom: 1px solid #e9ecef;
+    font-weight: 600;
+    color: #495057;
+}
+
+.order-detail-modal .table {
+    margin-bottom: 0;
+}
+
+.order-detail-modal .table td {
+    padding: 12px 15px;
+    border-top: 1px solid #e9ecef;
+}
+
+.order-detail-modal .table td:first-child {
+    font-weight: 600;
+    color: #495057;
+    width: 30%;
+}
+
+/* Product table in order details */
+.order-detail-modal .table thead th {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    font-weight: 600;
+    padding: 15px;
+}
+
+.order-detail-modal .table tbody td {
+    padding: 15px;
+    vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .order-detail-modal {
+        max-width: 98% !important;
+        width: 98% !important;
+        margin: 10px auto;
+    }
+
+    .order-detail-modal .modal-body {
+        padding: 20px;
+        max-height: 70vh;
+    }
+}
