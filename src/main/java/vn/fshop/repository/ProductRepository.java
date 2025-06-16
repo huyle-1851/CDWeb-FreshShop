@@ -40,10 +40,9 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE p.category.id = :categoryId AND p.status IN ('ACTIVE', 'PAUSED')")
     List<Product> findVisibleProductsByCategoryIdWithImages(@Param("categoryId") Integer categoryId);
 
-    // Search visible products
+    // Search visible products by name only
     @Query("SELECT DISTINCT p FROM Product p LEFT JOIN FETCH p.images WHERE " +
-           "(LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR " +
-           "LOWER(p.description) LIKE LOWER(CONCAT('%', :searchTerm, '%'))) AND " +
+           "LOWER(p.name) LIKE LOWER(CONCAT('%', :searchTerm, '%')) AND " +
            "p.status IN ('ACTIVE', 'PAUSED')")
     List<Product> searchVisibleProductsWithImages(@Param("searchTerm") String searchTerm);
 
