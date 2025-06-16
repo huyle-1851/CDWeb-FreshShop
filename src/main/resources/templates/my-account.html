@@ -586,16 +586,39 @@ function updateProfile(event) {
 function changePassword(event) {
     event.preventDefault();
 
+    const currentPassword = document.getElementById('currentPassword').value;
+    const newPassword = document.getElementById('newPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+
+    // Client-side validation
+    if (!currentPassword.trim()) {
+        showAlert('danger', 'Vui lòng nhập mật khẩu hiện tại');
+        return;
+    }
+    if (newPassword.length < 6) {
+        showAlert('danger', 'Mật khẩu mới phải có ít nhất 6 ký tự');
+        return;
+    }
+    if (newPassword !== confirmPassword) {
+        showAlert('danger', 'Xác nhận mật khẩu không khớp');
+        return;
+    }
+
     const formData = new FormData();
-    formData.append('currentPassword', document.getElementById('currentPassword').value);
-    formData.append('newPassword', document.getElementById('newPassword').value);
-    formData.append('confirmPassword', document.getElementById('confirmPassword').value);
+    formData.append('currentPassword', currentPassword);
+    formData.append('newPassword', newPassword);
+    formData.append('confirmPassword', confirmPassword);
 
     fetch('/account/password/change', {
         method: 'POST',
         body: formData
     })
-    .then(response => response.json())
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        return response.json();
+    })
     .then(data => {
         if (data.success) {
             showAlert('success', data.message);
@@ -614,7 +637,6 @@ function changePassword(event) {
         }
     })
     .catch(error => {
-        console.error('Error:', error);
         showAlert('danger', 'Có lỗi xảy ra khi đổi mật khẩu');
     });
 }

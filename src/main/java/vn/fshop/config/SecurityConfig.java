@@ -47,7 +47,7 @@ public class SecurityConfig {
                 .permitAll()
             )
             .csrf(csrf -> csrf
-                .ignoringRequestMatchers("/add-item", "/remove-item-cart", "/clear-cart", "/cart-count", "/login", "/admin/**", "/logout", "/api/**", "/checkout", "/checkout/**")
+                .ignoringRequestMatchers("/add-item", "/remove-item-cart", "/clear-cart", "/cart-count", "/login", "/admin/**", "/logout", "/api/**", "/checkout", "/checkout/**", "/account/**")
             );
 
         return http.build();

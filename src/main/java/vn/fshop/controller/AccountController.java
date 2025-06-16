@@ -100,21 +100,21 @@ public class AccountController {
             @RequestParam String newPassword,
             @RequestParam String confirmPassword,
             HttpSession session) {
-        
+
         String username = (String) session.getAttribute("username");
         if (username == null) {
-            return ResponseEntity.status(401).body(Map.of("error", "Unauthorized"));
+            return ResponseEntity.status(401).body(Map.of("error", "Phiên đăng nhập đã hết hạn"));
         }
 
         User user = userService.findByUsername(username).orElse(null);
         if (user == null) {
-            return ResponseEntity.status(404).body(Map.of("error", "User not found"));
+            return ResponseEntity.status(404).body(Map.of("error", "Không tìm thấy người dùng"));
         }
 
         try {
             // Validate passwords
             Map<String, String> errors = new HashMap<>();
-            
+
             if (currentPassword == null || currentPassword.trim().isEmpty()) {
                 errors.put("currentPassword", "Mật khẩu hiện tại không được để trống");
             }

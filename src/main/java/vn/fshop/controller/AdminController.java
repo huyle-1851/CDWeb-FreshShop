@@ -233,8 +233,11 @@ public class AdminController extends BaseController {
         }
         try {
             List<Category> categories = categoryService.getAllCategory();
+            List<CategoryDTO> categoryDTOs = categories.stream()
+                .map(category -> new CategoryDTO(category, categoryService.getAmountProductById(category.getId())))
+                .toList();
             Map<String, Object> response = new HashMap<>();
-            response.put("categories", categories);
+            response.put("categories", categoryDTOs);
             response.put("success", true);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
