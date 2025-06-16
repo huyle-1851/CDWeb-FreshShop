@@ -173,7 +173,7 @@ public class AccountController {
             // Calculate statistics
             int orderCount = orders.size();
             long totalSpent = orders.stream()
-                    .filter(order -> "DELIVERED".equals(order.getStatus()))
+                    .filter(order -> "PAID".equals(order.getPaymentStatus()))
                     .mapToLong(Order::getTotalAmount)
                     .sum();
 

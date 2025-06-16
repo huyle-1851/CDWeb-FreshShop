@@ -26,13 +26,16 @@ public interface OrderRepository extends JpaRepository<Order, Integer> {
     
     // Count orders by status
     long countByStatus(String status);
+
+    // Count orders by payment status
+    long countByPaymentStatus(String paymentStatus);
     
-    // Get total revenue
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = 'DELIVERED'")
+    // Get total revenue (based on payment status)
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.paymentStatus = 'PAID'")
     Long getTotalRevenue();
-    
-    // Get revenue by date range
-    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.status = 'DELIVERED' AND o.orderDate BETWEEN :startDate AND :endDate")
+
+    // Get revenue by date range (based on payment status)
+    @Query("SELECT COALESCE(SUM(o.totalAmount), 0) FROM Order o WHERE o.paymentStatus = 'PAID' AND o.orderDate BETWEEN :startDate AND :endDate")
     Long getRevenueByDateRange(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate);
     
     // Get recent orders

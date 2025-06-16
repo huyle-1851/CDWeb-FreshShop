@@ -331,12 +331,15 @@ public class AdminController extends BaseController {
             long confirmedCount = orderService.getOrderCountByStatus("CONFIRMED");
             long shippingCount = orderService.getOrderCountByStatus("SHIPPING");
             long deliveredCount = orderService.getOrderCountByStatus("DELIVERED");
+            long paidCount = orderService.getPaidOrdersCount();
+            long pendingPaymentCount = orderService.getPendingPaymentOrdersCount();
             Long totalRevenue = orderService.getTotalRevenue();
             Map<String, Object> response = new HashMap<>();
             response.put("orders", orderDTOs);
             response.put("statistics", Map.of(
                 "pending", pendingCount, "confirmed", confirmedCount,
                 "shipping", shippingCount, "delivered", deliveredCount,
+                "paid", paidCount, "pendingPayment", pendingPaymentCount,
                 "totalRevenue", totalRevenue != null ? totalRevenue : 0
             ));
             response.put("success", true);
@@ -374,9 +377,15 @@ public class AdminController extends BaseController {
         }
         try {
             Order order = orderService.updatePaymentStatus(id, paymentStatus);
+
+            // Get updated revenue statistics
+            Map<String, Object> revenueStats = orderService.getRevenueStatistics();
+
             Map<String, Object> response = new HashMap<>();
             response.put("order", new OrderDTO(order));
             response.put("message", "Cập nhật trạng thái thanh toán thành công");
+            response.put("revenueUpdated", "PAID".equals(paymentStatus));
+            response.put("currentRevenue", revenueStats.get("totalRevenue"));
             response.put("success", true);
             return ResponseEntity.ok(response);
         } catch (Exception e) {
@@ -456,8 +465,10 @@ public class AdminController extends BaseController {
             long deliveredOrders = orderService.getOrderCountByStatus("DELIVERED");
             long cancelledOrders = orderService.getOrderCountByStatus("CANCELLED");
 
-            // Revenue statistics
+            // Revenue and payment statistics
             Long totalRevenue = orderService.getTotalRevenue();
+            long paidOrdersCount = orderService.getPaidOrdersCount();
+            long pendingPaymentCount = orderService.getPendingPaymentOrdersCount();
 
             // Recent orders
             List<Order> recentOrders = orderService.getRecentOrders();
@@ -483,7 +494,9 @@ public class AdminController extends BaseController {
                 "cancelled", cancelledOrders
             ));
             response.put("revenueStats", Map.of(
-                "total", totalRevenue != null ? totalRevenue : 0
+                "total", totalRevenue != null ? totalRevenue : 0,
+                "paidOrders", paidOrdersCount,
+                "pendingPayment", pendingPaymentCount
             ));
             response.put("productStats", Map.of(
                 "total", totalProducts,
@@ -515,6 +528,8 @@ public class AdminController extends BaseController {
                               orderService.getOrderCountByStatus("SHIPPING");
             long pendingOrders = orderService.getOrderCountByStatus("PENDING");
             long deliveredOrders = orderService.getOrderCountByStatus("DELIVERED");
+            long paidOrders = orderService.getPaidOrdersCount();
+            long pendingPaymentOrders = orderService.getPendingPaymentOrdersCount();
             Long totalRevenue = orderService.getTotalRevenue();
 
             // Product statistics
@@ -536,6 +551,7 @@ public class AdminController extends BaseController {
 
             Map<String, Object> stats = new HashMap<>();
             stats.put("orders", Map.of("total", totalOrders, "pending", pendingOrders, "delivered", deliveredOrders));
+            stats.put("payments", Map.of("paid", paidOrders, "pending", pendingPaymentOrders));
             stats.put("revenue", Map.of("total", totalRevenue != null ? totalRevenue : 0, "recent", recentRevenue != null ? recentRevenue : 0));
             stats.put("products", Map.of("total", totalProducts, "active", activeProducts));
             stats.put("categories", Map.of("total", totalCategories));

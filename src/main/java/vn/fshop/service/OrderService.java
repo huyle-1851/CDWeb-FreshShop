@@ -13,7 +13,9 @@ import vn.fshop.repository.OrderItemRepository;
 import vn.fshop.util.CartUtils;
 
 import java.time.LocalDateTime;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -52,15 +54,37 @@ public class OrderService {
         throw new RuntimeException("Order not found with ID: " + orderId);
     }
 
-    // Update payment status
+    // Update payment status with revenue tracking
     public Order updatePaymentStatus(Integer orderId, String paymentStatus) {
         Optional<Order> orderOpt = orderRepository.findById(orderId);
         if (orderOpt.isPresent()) {
             Order order = orderOpt.get();
+            String oldPaymentStatus = order.getPaymentStatus();
+
+            // Update payment status
             order.setPaymentStatus(paymentStatus);
-            return orderRepository.save(order);
+            Order savedOrder = orderRepository.save(order);
+
+            // Log revenue change for tracking purposes
+            logRevenueChange(order, oldPaymentStatus, paymentStatus);
+
+            return savedOrder;
         }
         throw new RuntimeException("Order not found with ID: " + orderId);
+    }
+
+    // Helper method to log revenue changes
+    private void logRevenueChange(Order order, String oldStatus, String newStatus) {
+        boolean wasRevenueCounted = "PAID".equals(oldStatus);
+        boolean isRevenueCounted = "PAID".equals(newStatus);
+
+        if (!wasRevenueCounted && isRevenueCounted) {
+            // Revenue added
+            System.out.println("Revenue added: Order #" + order.getId() + " - Amount: " + order.getTotalAmount() + "đ");
+        } else if (wasRevenueCounted && !isRevenueCounted) {
+            // Revenue removed
+            System.out.println("Revenue removed: Order #" + order.getId() + " - Amount: " + order.getTotalAmount() + "đ");
+        }
     }
 
     // Get order statistics
@@ -74,6 +98,31 @@ public class OrderService {
 
     public Long getRevenueByDateRange(LocalDateTime startDate, LocalDateTime endDate) {
         return orderRepository.getRevenueByDateRange(startDate, endDate);
+    }
+
+    // Get count of paid orders
+    public long getPaidOrdersCount() {
+        return orderRepository.countByPaymentStatus("PAID");
+    }
+
+    // Get count of pending payment orders
+    public long getPendingPaymentOrdersCount() {
+        return orderRepository.countByPaymentStatus("PENDING");
+    }
+
+    // Get revenue statistics summary
+    public Map<String, Object> getRevenueStatistics() {
+        Long totalRevenue = getTotalRevenue();
+        long paidOrdersCount = getPaidOrdersCount();
+        long pendingPaymentCount = getPendingPaymentOrdersCount();
+
+        Map<String, Object> stats = new HashMap<>();
+        stats.put("totalRevenue", totalRevenue != null ? totalRevenue : 0);
+        stats.put("paidOrdersCount", paidOrdersCount);
+        stats.put("pendingPaymentCount", pendingPaymentCount);
+        stats.put("averageOrderValue", paidOrdersCount > 0 ? (totalRevenue != null ? totalRevenue : 0) / paidOrdersCount : 0);
+
+        return stats;
     }
 
     // Get recent orders (last 7 days)
