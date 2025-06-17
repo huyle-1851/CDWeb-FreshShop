@@ -182,7 +182,6 @@ function clearCart() {
     })
     .then(response => response.text())
     .then(data => {
-        console.log('Cart cleared:', data);
         // Update cart dropdown if visible
         if (cartDropdownVisible) {
             loadCartItems();
@@ -191,7 +190,6 @@ function clearCart() {
         showCartMessage('Đã xóa tất cả sản phẩm khỏi giỏ hàng!', 'success');
     })
     .catch(error => {
-        console.error('Error clearing cart:', error);
         showCartMessage('Có lỗi xảy ra khi xóa giỏ hàng!', 'error');
     });
 }
@@ -290,52 +288,36 @@ function showCartMessage(message, type = 'info') {
 let cartDropdownVisible = false;
 
 function toggleCartDropdown() {
-    console.log('toggleCartDropdown called');
-    testCartDropdown();
-}
-
-// Ultra simple test functions for cart dropdown
-function showTestDropdown() {
-    console.log('showTestDropdown called');
-    alert('showTestDropdown function called!');
-
-    const dropdown = document.getElementById('cart-dropdown');
-    console.log('Looking for cart-dropdown element...');
-
-    if (!dropdown) {
-        console.log('ERROR: Cart dropdown element not found!');
-        alert('ERROR: Cart dropdown element not found!');
-        return;
+    if (cartDropdownVisible) {
+        hideCartDropdown();
+    } else {
+        showCartDropdown();
     }
-
-    console.log('Cart dropdown element found! Showing...');
-    dropdown.style.display = 'block';
-    alert('Dropdown should now be visible!');
 }
 
-function hideTestDropdown() {
-    console.log('hideTestDropdown called');
+// Cart dropdown functionality
+function showCartDropdown() {
     const dropdown = document.getElementById('cart-dropdown');
+    if (dropdown) {
+        dropdown.style.display = 'block';
+        cartDropdownVisible = true;
+    }
+}
 
+function hideCartDropdown() {
+    const dropdown = document.getElementById('cart-dropdown');
     if (dropdown) {
         dropdown.style.display = 'none';
-        console.log('Cart dropdown hidden');
-    } else {
-        console.log('Cart dropdown element not found for hiding');
+        cartDropdownVisible = false;
     }
-}
-
-// Legacy function names for compatibility
-function testCartDropdown() {
-    showTestDropdown();
-}
-
-function showCartDropdown() {
-    showTestDropdown();
 }
 
 function toggleCartDropdown() {
-    showTestDropdown();
+    if (cartDropdownVisible) {
+        hideCartDropdown();
+    } else {
+        showCartDropdown();
+    }
 }
 
 function hideCartDropdown() {
@@ -368,7 +350,6 @@ function loadCartItems() {
     const loading = document.getElementById('cart-loading');
 
     if (!container) {
-        console.log('Cart items container not found');
         return;
     }
 
@@ -392,7 +373,6 @@ function loadCartItems() {
         renderCartItems(data);
     })
     .catch(error => {
-        console.error('Error loading cart items:', error);
         if (loading) {
             loading.style.display = 'none';
         }
@@ -408,7 +388,6 @@ function renderCartItems(data) {
     const countElement = document.getElementById('cart-count-text');
 
     if (!container) {
-        console.log('Cart items container not found in renderCartItems');
         return;
     }
 
@@ -468,38 +447,26 @@ function removeFromCartDropdown(productId) {
     })
     .then(response => response.text())
     .then(data => {
-        console.log('Item removed from cart:', data);
         // Reload cart items
         loadCartItems();
         updateCartBadge();
         showCartMessage('Đã xóa sản phẩm khỏi giỏ hàng!', 'success');
     })
     .catch(error => {
-        console.error('Error removing item from cart:', error);
         showCartMessage('Có lỗi xảy ra khi xóa sản phẩm!', 'error');
     });
 }
 
 // Initialize cart functionality on page load
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('myjs.js loaded successfully!');
-
     updateCartBadge();
 
-    // Test cart dropdown elements
+    // Initialize cart dropdown elements
     const cartDropdown = document.getElementById('cart-dropdown');
     const cartToggle = document.getElementById('cart-toggle');
 
-    console.log('Cart dropdown element:', cartDropdown);
-    console.log('Cart toggle element:', cartToggle);
-
     if (cartDropdown && cartToggle) {
-        console.log('✅ Cart dropdown elements found!');
         cartDropdownVisible = false;
         cartDropdown.style.display = 'none';
-    } else {
-        console.log('❌ Cart dropdown elements not found on this page');
-        if (!cartDropdown) console.log('Missing: cart-dropdown');
-        if (!cartToggle) console.log('Missing: cart-toggle');
     }
 });

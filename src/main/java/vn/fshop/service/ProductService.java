@@ -154,7 +154,6 @@ public class ProductService {
             java.nio.file.Path uploadPath = java.nio.file.Paths.get(uploadDir);
             if (!java.nio.file.Files.exists(uploadPath)) {
                 java.nio.file.Files.createDirectories(uploadPath);
-                System.out.println("Created directory: " + uploadPath);
             }
 
             // Get original filename and extension

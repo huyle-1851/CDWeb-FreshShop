@@ -241,7 +241,7 @@ function displayOrders(data) {
                         <button class="btn btn-sm btn-info" onclick="viewOrderDetails(${order.id})">
                             <i class="fa fa-eye"></i> Xem
                         </button>
-                        ${canCancel ? `<button class="btn btn-sm btn-danger ml-1" onclick="cancelOrder(${order.id})">
+                        ${canCancel ? `<button class="btn btn-sm btn-danger ml-1 cancel-order-btn" data-order-id="${order.id}">
                             <i class="fa fa-times"></i> Hủy
                         </button>` : ''}
                     </td>
@@ -746,7 +746,7 @@ function displayOrderDetails(order) {
                 <i class="fa fa-arrow-left"></i> Quay lại danh sách đơn hàng
             </button>
             ${(order.status === 'PENDING' || order.status === 'CONFIRMED') ? `
-                <button class="btn btn-danger ml-2" onclick="cancelOrder(${order.id})">
+                <button class="btn btn-danger ml-2 cancel-order-btn" data-order-id="${order.id}">
                     <i class="fa fa-times"></i> Hủy đơn hàng
                 </button>
             ` : ''}
@@ -758,9 +758,59 @@ function displayOrderDetails(order) {
 
 
 
-// Cancel order function (placeholder - not functional)
+
+
+// Cancel order function - with detailed debugging
 function cancelOrder(orderId) {
-    alert('Chức năng hủy đơn hàng đang được phát triển');
+    console.log('=== CANCEL ORDER FUNCTION START ===');
+    console.log('Order ID:', orderId);
+
+    if (!confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?')) {
+        console.log('User cancelled the confirmation');
+        return;
+    }
+
+    console.log('User confirmed cancellation');
+    console.log('Making fetch request to:', '/account/orders/' + orderId + '/cancel');
+
+    // Simple fetch request with detailed logging
+    fetch('/account/orders/' + orderId + '/cancel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(function(response) {
+        console.log('=== FETCH RESPONSE RECEIVED ===');
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+        console.log('Response headers:', response.headers);
+
+        if (!response.ok) {
+            throw new Error('HTTP error! status: ' + response.status);
+        }
+
+        return response.json();
+    })
+    .then(function(data) {
+        console.log('=== RESPONSE DATA ===');
+        console.log('Data:', data);
+
+        if (data.success) {
+            alert('Hủy đơn hàng thành công!');
+            location.reload(); // Simple page reload
+        } else {
+            alert('Lỗi: ' + (data.error || 'Không thể hủy đơn hàng'));
+        }
+    })
+    .catch(function(error) {
+        console.log('=== FETCH ERROR ===');
+        console.log('Error:', error);
+        console.log('Error message:', error.message);
+        alert('Có lỗi xảy ra: ' + error.message);
+    });
+
+    console.log('=== FETCH REQUEST INITIATED ===');
 }
 
 // Show alert function
@@ -785,26 +835,7 @@ function showAlert(type, message) {
     }, 5000);
 }
 
-// Payment status utility functions
-function getPaymentStatusColor(status) {
-    const colors = {
-        'PENDING': 'warning',
-        'PAID': 'success',
-        'FAILED': 'danger',
-        'REFUNDED': 'info'
-    };
-    return colors[status] || 'secondary';
-}
 
-function getPaymentStatusText(status) {
-    const texts = {
-        'PENDING': 'Chờ thanh toán',
-        'PAID': 'Đã thanh toán',
-        'FAILED': 'Thanh toán thất bại',
-        'REFUNDED': 'Đã hoàn tiền'
-    };
-    return texts[status] || status;
-}
 
 // Get current user data from Thymeleaf
 const currentUser = {
@@ -903,6 +934,17 @@ document.addEventListener('DOMContentLoaded', function() {
     if (window.location.hash === '#addresses') {
         loadAddressSettings();
     }
+
+    // Add event delegation for cancel order buttons
+    document.addEventListener('click', function(event) {
+        if (event.target.closest('.cancel-order-btn')) {
+            event.preventDefault();
+            const button = event.target.closest('.cancel-order-btn');
+            const orderId = button.getAttribute('data-order-id');
+            console.log('Cancel button clicked for order:', orderId);
+            cancelOrder(orderId);
+        }
+    });
 });
 </script>
 

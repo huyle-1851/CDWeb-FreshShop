@@ -60,7 +60,7 @@ public class CdWebFreshShopApplication implements CommandLineRunner {
 				}
 			}
 		} catch (Exception e) {
-			System.err.println("Error initializing sample data: " + e.getMessage());
+			// Error initializing sample data - continue startup
 		}
 	}
 
@@ -113,7 +113,7 @@ public class CdWebFreshShopApplication implements CommandLineRunner {
 			Image image = new Image(product, imageUrl);
 			imageRepository.save(image);
 		} catch (Exception e) {
-			System.err.println("Error adding image to product " + product.getName() + ": " + e.getMessage());
+			// Error adding image to product - continue
 		}
 	}
 

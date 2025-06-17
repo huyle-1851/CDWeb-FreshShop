@@ -92,7 +92,7 @@ public class UserService {
                     saveUser(adminUser);
                 }
             } catch (Exception e) {
-                System.err.println("Failed to create default admin user: " + e.getMessage());
+                // Failed to create default admin user - continue startup
             }
         }
     }

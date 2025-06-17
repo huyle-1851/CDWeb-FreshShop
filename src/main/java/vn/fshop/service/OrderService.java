@@ -78,12 +78,11 @@ public class OrderService {
         boolean wasRevenueCounted = "PAID".equals(oldStatus);
         boolean isRevenueCounted = "PAID".equals(newStatus);
 
+        // Revenue tracking logic without console output
         if (!wasRevenueCounted && isRevenueCounted) {
             // Revenue added
-            System.out.println("Revenue added: Order #" + order.getId() + " - Amount: " + order.getTotalAmount() + "đ");
         } else if (wasRevenueCounted && !isRevenueCounted) {
             // Revenue removed
-            System.out.println("Revenue removed: Order #" + order.getId() + " - Amount: " + order.getTotalAmount() + "đ");
         }
     }
 
@@ -188,8 +187,64 @@ public class OrderService {
         return orderRepository.findById(orderId);
     }
 
-    // Delete order
+    // Cancel order (change status to CANCELLED)
+    public Order cancelOrder(Integer orderId) {
+        try {
+            Optional<Order> orderOpt = orderRepository.findById(orderId);
+            if (!orderOpt.isPresent()) {
+                throw new RuntimeException("Order not found with ID: " + orderId);
+            }
+
+            Order order = orderOpt.get();
+
+            // Check if order can be cancelled
+            if ("DELIVERED".equals(order.getStatus()) || "CANCELLED".equals(order.getStatus())) {
+                throw new RuntimeException("Cannot cancel order with status: " + order.getStatus());
+            }
+
+            // Cancel the order
+            order.setStatus("CANCELLED");
+
+            // Save the order
+            Order savedOrder = orderRepository.save(order);
+
+            return savedOrder;
+
+        } catch (Exception e) {
+            System.out.println("Error cancelling order: " + e.getMessage());
+            e.printStackTrace();
+            throw new RuntimeException("Failed to cancel order: " + e.getMessage(), e);
+        }
+    }
+
+    // Delete order (with proper handling of foreign key constraints)
+    // Only allows deletion of CANCELLED orders
     public void deleteOrder(Integer orderId) {
-        orderRepository.deleteById(orderId);
+        try {
+            // First, find the order to ensure it exists
+            Optional<Order> orderOpt = orderRepository.findById(orderId);
+            if (!orderOpt.isPresent()) {
+                throw new RuntimeException("Order not found with ID: " + orderId);
+            }
+
+            Order order = orderOpt.get();
+
+            // Only allow deletion of cancelled orders
+            if (!"CANCELLED".equals(order.getStatus())) {
+                throw new RuntimeException("Only cancelled orders can be deleted. Current status: " + order.getStatus());
+            }
+
+            // Delete all order items first to avoid foreign key constraint issues
+            List<OrderItem> orderItems = orderItemRepository.findByOrder_Id(orderId);
+            if (!orderItems.isEmpty()) {
+                orderItemRepository.deleteAll(orderItems);
+            }
+
+            // Now delete the order
+            orderRepository.delete(order);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to delete order: " + e.getMessage(), e);
+        }
     }
 }

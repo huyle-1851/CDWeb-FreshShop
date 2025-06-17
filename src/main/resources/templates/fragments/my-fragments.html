@@ -471,19 +471,16 @@
 
         function clearCartWorking() {
             if (confirm('Bạn có chắc chắn muốn xóa tất cả sản phẩm khỏi giỏ hàng?')) {
-                console.log('Clearing cart');
-
                 fetch('/clear-cart', {
                     method: 'POST'
                 })
                 .then(response => response.text())
                 .then(data => {
-                    console.log('Cart cleared:', data);
                     // Reload cart items
                     loadCartItemsWorking();
                 })
                 .catch(error => {
-                    console.error('Error clearing cart:', error);
+                    // Error clearing cart
                 });
             }
         }

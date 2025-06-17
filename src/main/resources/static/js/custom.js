@@ -264,7 +264,6 @@ function addItem(idP, price, sizeList, input, cumulative) {
     const quantity = document.getElementsByTagName('input')[1].value;
 
     $.post("add-item?idP=" + idP + "&quan=" + quantity + "&cumulative=" + cumulative);
-    console.log("add-item?idP=" + idP + "&quan=" + quantity + "&cumulative=" + cumulative)
 };
 
 function updateCart(id) {

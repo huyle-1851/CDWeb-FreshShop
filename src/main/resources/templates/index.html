@@ -343,18 +343,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }, 1000);
 });
 
-// Simple filter function
-function x() {
-    console.log('Filter function called');
+// Filter function for product grid
+function applyFilter() {
     try {
         if (typeof $ !== 'undefined' && typeof $.fn.isotope !== 'undefined') {
             $('.special-grid').isotope({ filter: '*' });
-            console.log('Filter applied successfully');
-        } else {
-            console.log('jQuery or Isotope not available for filtering');
         }
     } catch (e) {
-        console.log('Filter error:', e);
+        // Filter not available
     }
 }
 </script>

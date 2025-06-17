@@ -197,11 +197,17 @@ public class AccountController {
     @PostMapping("/orders/{orderId}/cancel")
     @ResponseBody
     public ResponseEntity<Map<String, Object>> cancelOrder(@PathVariable Integer orderId, HttpSession session) {
+        System.out.println("=== CANCEL ORDER REQUEST RECEIVED ===");
+        System.out.println("Order ID: " + orderId);
+        System.out.println("Session ID: " + session.getId());
+
         Map<String, Object> response = new HashMap<>();
 
         try {
             String username = (String) session.getAttribute("username");
+            System.out.println("Username from session: " + username);
             if (username == null) {
+                System.out.println("No username in session - unauthorized");
                 response.put("success", false);
                 response.put("error", "Phiên đăng nhập đã hết hạn");
                 return ResponseEntity.status(401).body(response);
@@ -231,18 +237,25 @@ public class AccountController {
             // Check if order can be cancelled
             if (!"PENDING".equals(order.getStatus()) && !"CONFIRMED".equals(order.getStatus())) {
                 response.put("success", false);
-                response.put("error", "Không thể hủy đơn hàng ở trạng thái: " + order.getStatus());
+                response.put("error", "Không thể hủy đơn hàng ở trạng thái: " + order.getStatusDisplay());
                 return ResponseEntity.badRequest().body(response);
             }
 
-            // Cancel the order
-            order.setStatus("CANCELLED");
-            Order savedOrder = orderService.saveOrder(order);
+            // Cancel the order using service method
+            System.out.println("=== CALLING ORDER SERVICE ===");
+            System.out.println("Calling orderService.cancelOrder for order ID: " + orderId);
+            System.out.println("Current order status before cancel: " + order.getStatus());
+
+            Order savedOrder = orderService.cancelOrder(orderId);
+
+            System.out.println("=== ORDER SERVICE COMPLETED ===");
+            System.out.println("Order cancelled successfully. New status: " + savedOrder.getStatus());
 
             response.put("success", true);
             response.put("message", "Hủy đơn hàng #" + orderId + " thành công");
             response.put("order", new OrderDTO(savedOrder));
 
+            System.out.println("Returning success response");
             return ResponseEntity.ok(response);
 
         } catch (Exception e) {

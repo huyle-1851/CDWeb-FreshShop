@@ -47,7 +47,7 @@ public class Order {
     @Column(name = "payment_status")
     private String paymentStatus = "PENDING"; // PENDING, PAID, FAILED
 
-    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, fetch = FetchType.EAGER, orphanRemoval = true)
     private List<OrderItem> orderItems = new ArrayList<>();
 
     // Helper methods for status display
